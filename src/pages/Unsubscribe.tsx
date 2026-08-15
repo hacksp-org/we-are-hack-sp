@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { configUrl } from '../config/config';
+import { apiUrl, configUrl } from '../config/config';
 import { HeartCrack, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Link2Off, FlaskConical } from 'lucide-react';
-
-// VITE_SUBSCRIBE_ENDPOINT may hold either the API origin or the full
-// subscribers endpoint, so only its origin is reused to build the path below.
-const API_ORIGIN = new URL(import.meta.env.VITE_SUBSCRIBE_ENDPOINT).origin;
-const UNSUBSCRIBE_ENDPOINT = `${API_ORIGIN}/api/subscribers/unsubscribe`;
 
 export const Unsubscribe: React.FC = () => {
   const { t, setLanguage } = useLanguage();
@@ -35,7 +30,7 @@ export const Unsubscribe: React.FC = () => {
     setStatus('loading');
 
     try {
-      const res = await fetch(UNSUBSCRIBE_ENDPOINT, {
+      const res = await fetch(apiUrl.unsubscribe, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, sig }),

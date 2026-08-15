@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { brazilianStates } from '../constants/states';
+import { apiUrl } from '../config/config';
 import { Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-
-const SUBSCRIBE_ENDPOINT = import.meta.env.VITE_SUBSCRIBE_ENDPOINT;
 
 export const Join: React.FC = () => {
   const { t } = useLanguage();
@@ -19,7 +18,7 @@ export const Join: React.FC = () => {
     setStatus('loading');
 
     try {
-      const res = await fetch(SUBSCRIBE_ENDPOINT, {
+      const res = await fetch(apiUrl.subscribe, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
