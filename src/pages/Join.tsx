@@ -520,7 +520,7 @@ export const Join: React.FC = () => {
   return (
     // Solid background of its own: this page sits outside the site layout.
     <div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-4xl bg-card rounded-[2rem] overflow-hidden grid md:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] md:min-h-[620px]">
+      <div className="w-full max-w-6xl bg-card rounded-[2rem] overflow-hidden grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:aspect-video">
         <aside className="flex md:flex-col items-center md:items-start justify-between md:justify-center gap-6 p-8 md:p-10 border-b md:border-b-0 md:border-r border-hairline">
           <img src={theme === 'dark' ? hDark : hLight} alt="Hack SP" className="h-9 md:h-12" />
           <p className="hidden md:block text-sm opacity-45 leading-relaxed">{t('register.subtitle')}</p>
@@ -545,7 +545,8 @@ export const Join: React.FC = () => {
           )}
         </aside>
 
-        <section className="flex flex-col justify-center gap-8 p-8 sm:p-10 md:p-12">
+        {/* The card is a fixed 16:9 box, so a long step scrolls inside it. */}
+        <section className="flex flex-col justify-center gap-8 p-8 sm:p-10 md:p-12 md:overflow-y-auto">
           <h1 className="text-xs font-medium uppercase tracking-[0.2em] opacity-35">{t('register.title')}</h1>
           {renderStep()}
         </section>
