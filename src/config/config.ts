@@ -10,6 +10,9 @@ export const configUrl = {
 const apiOrigin = new URL(import.meta.env.VITE_SUBSCRIBE_ENDPOINT).origin;
 
 export const apiUrl = {
-    subscribe: `${apiOrigin}/api/subscribers`,
-    unsubscribe: `${apiOrigin}/api/subscribers/unsubscribe`
+    unsubscribe: `${apiOrigin}/api/subscribers/unsubscribe`,
+    registrations: `${apiOrigin}/api/registrations`,
+    verifyEmail: (id: string) => `${apiOrigin}/api/registrations/${id}/verify-email`,
+    resendCode: (id: string) => `${apiOrigin}/api/registrations/${id}/resend-code`,
+    dependents: (guardianId: string) => `${apiOrigin}/api/registrations/${guardianId}/dependents`
 } as const;

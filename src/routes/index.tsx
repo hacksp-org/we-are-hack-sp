@@ -40,10 +40,6 @@ export const router = createBrowserRouter([
         element: <FAQ />,
       },
       {
-        path: 'join',
-        element: <Join />,
-      },
-      {
         path: 'unsubscribe',
         element: <Unsubscribe />,
       },
@@ -52,5 +48,10 @@ export const router = createBrowserRouter([
         element: <EventPage />,
       },
     ],
+  },
+  // Standalone page: no header or footer, so registration stands apart from the site.
+  {
+    path: '/join',
+    element: <Join />,
   },
 ]);
