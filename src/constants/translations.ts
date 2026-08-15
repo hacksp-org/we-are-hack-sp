@@ -164,6 +164,7 @@ export const translations = {
     "register.error.invalid": "Confira os campos — algum dado não foi aceito.",
     "register.error.rateLimit": "Muitas tentativas. Aguarde um instante e tente de novo.",
     "register.error.emailFailed": "Sua inscrição foi salva, mas não conseguimos enviar o e-mail com o código. Fale com a gente em {email} para concluir.",
+    "register.error.emailFailedRetry": "Sua inscrição foi salva, mas o e-mail com o código não saiu. Toque em \"Reenviar código\" para tentar de novo.",
     "register.error.generic": "Não foi possível enviar sua inscrição. Tente novamente em instantes.",
 
     "register.success.title": "Inscrição concluída!",
@@ -356,6 +357,7 @@ export const translations = {
     "register.error.invalid": "Please check the fields — some data wasn't accepted.",
     "register.error.rateLimit": "Too many attempts. Please wait a moment and try again.",
     "register.error.emailFailed": "Your registration was saved, but we couldn't send the email with the code. Reach out to us at {email} to finish it.",
+    "register.error.emailFailedRetry": "Your registration was saved, but the email with the code didn't go out. Tap \"Resend code\" to try again.",
     "register.error.generic": "We couldn't submit your registration. Please try again in a moment.",
 
     "register.success.title": "Registration complete!",

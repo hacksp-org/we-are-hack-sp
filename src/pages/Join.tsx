@@ -94,7 +94,8 @@ export const Join: React.FC = () => {
     if (httpStatus === 409) return 'register.error.duplicate';
     if (httpStatus === 422) return 'register.error.invalid';
     if (httpStatus === 429) return 'register.error.rateLimit';
-    // The registration is saved but no id comes back, so resending is not an option here.
+    // Only reached when a 502 arrives without the id/sig body — an older API
+    // build. With them, handleSubmit routes the registrant to resend instead.
     if (httpStatus === 502) return 'register.error.emailFailed';
     return 'register.error.generic';
   };
@@ -141,6 +142,18 @@ export const Join: React.FC = () => {
         const body = await res.json();
         startVerification({ id: body.id, sig: body.sig, email: payload.email, category });
         return;
+      }
+
+      // 502 means the registration was saved but the email never left. The
+      // body carries id and sig, so the registrant continues through resend
+      // instead of signing up again.
+      if (res.status === 502) {
+        const body = await res.json().catch(() => null);
+        if (body?.id && body?.sig) {
+          startVerification({ id: body.id, sig: body.sig, email: payload.email, category });
+          setError(t('register.error.emailFailedRetry'));
+          return;
+        }
       }
 
       setError(t(errorKeyForStatus(res.status), { email: configUrl.contactEmail }));
