@@ -114,7 +114,11 @@ export const translations = {
     "unsubscribe.success.rejoin": "Quero me inscrever de novo",
     "unsubscribe.error": "Não foi possível cancelar sua inscrição. Tente novamente em instantes.",
     "unsubscribe.invalid.title": "Link inválido ou expirado",
-    "unsubscribe.invalid.message": "Este link de cancelamento não é mais válido. Abra o link direto do e-mail que você recebeu — se o problema continuar, fale com a gente em {email}."
+    "unsubscribe.invalid.message": "Este link de cancelamento não é mais válido. Abra o link direto do e-mail que você recebeu — se o problema continuar, fale com a gente em {email}.",
+    "unsubscribe.test.badge": "Envio de teste",
+    "unsubscribe.test.notice": "Este é um link de um e-mail de teste — não existe inscrição por trás dele. Nada será cancelado.",
+    "unsubscribe.test.title": "Nenhuma inscrição foi cancelada",
+    "unsubscribe.test.message": "Era um link de teste, então a API não foi chamada. É exatamente esta a tela que a pessoa veria em um envio real."
   },
   en: {
     "nav.hackathons": "Hackathons",
@@ -232,7 +236,11 @@ export const translations = {
     "unsubscribe.success.rejoin": "I want to sign up again",
     "unsubscribe.error": "We couldn't cancel your subscription. Please try again in a moment.",
     "unsubscribe.invalid.title": "Invalid or expired link",
-    "unsubscribe.invalid.message": "This unsubscribe link is no longer valid. Please open the link straight from the email you received — if it keeps failing, reach out to us at {email}."
+    "unsubscribe.invalid.message": "This unsubscribe link is no longer valid. Please open the link straight from the email you received — if it keeps failing, reach out to us at {email}.",
+    "unsubscribe.test.badge": "Test send",
+    "unsubscribe.test.notice": "This link came from a test email — there's no subscription behind it. Nothing will be cancelled.",
+    "unsubscribe.test.title": "No subscription was cancelled",
+    "unsubscribe.test.message": "This was a test link, so the API was never called. This is exactly the screen a real recipient would see."
   },
 } as const;
 

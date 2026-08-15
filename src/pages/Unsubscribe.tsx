@@ -2,20 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { configUrl } from '../config/config';
-import { HeartCrack, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Link2Off } from 'lucide-react';
+import { HeartCrack, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Link2Off, FlaskConical } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const SUBSCRIBE_ENDPOINT = import.meta.env.VITE_SUBSCRIBE_ENDPOINT;
+const UNSUBSCRIBE_ENDPOINT = `${SUBSCRIBE_ENDPOINT?.replace(/\/$/, '')}/unsubscribe`;
 
 export const Unsubscribe: React.FC = () => {
   const { t, setLanguage } = useLanguage();
   const [searchParams] = useSearchParams();
 
   const id = searchParams.get('id');
-  const token = searchParams.get('token');
+  const sig = searchParams.get('sig');
   const lang = searchParams.get('lang');
+  const isTest = Boolean(searchParams.get('test'));
 
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'invalid'>(
-    id && token ? 'idle' : 'invalid'
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'test' | 'error' | 'invalid'>(
+    isTest || (id && sig) ? 'idle' : 'invalid'
   );
 
   useEffect(() => {
@@ -23,16 +25,21 @@ export const Unsubscribe: React.FC = () => {
   }, [lang, setLanguage]);
 
   const handleConfirm = async () => {
+    if (isTest) {
+      setStatus('test');
+      return;
+    }
+
     setStatus('loading');
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/subscribers/${id}/unsubscribe`, {
-        method: 'PATCH',
+      const res = await fetch(UNSUBSCRIBE_ENDPOINT, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ id, sig }),
       });
 
-      if (res.status === 401 || res.status === 403 || res.status === 404) {
+      if (res.status === 400 || res.status === 401 || res.status === 403 || res.status === 404) {
         setStatus('invalid');
         return;
       }
@@ -44,23 +51,37 @@ export const Unsubscribe: React.FC = () => {
     }
   };
 
+  const backHome = (
+    <Link
+      to="/"
+      className="inline-flex items-center gap-2 border border-border px-6 py-3 rounded-full font-semibold hover:border-primary transition-colors"
+    >
+      <ArrowLeft size={18} />
+      {t('unsubscribe.success.back')}
+    </Link>
+  );
+
   const renderCard = () => {
-    if (status === 'success') {
+    if (status === 'success' || status === 'test') {
+      const isTestResult = status === 'test';
+
       return (
         <div className="bg-primary/5 border border-primary/20 p-10 rounded-[2.5rem] text-center space-y-6">
-          <CheckCircle2 className="text-primary mx-auto" size={56} />
+          {isTestResult ? (
+            <FlaskConical className="text-primary mx-auto" size={56} />
+          ) : (
+            <CheckCircle2 className="text-primary mx-auto" size={56} />
+          )}
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold">{t('unsubscribe.success.title')}</h2>
-            <p className="text-lg opacity-80">{t('unsubscribe.success.message')}</p>
+            <h2 className="text-3xl font-bold">
+              {t(isTestResult ? 'unsubscribe.test.title' : 'unsubscribe.success.title')}
+            </h2>
+            <p className="text-lg opacity-80">
+              {t(isTestResult ? 'unsubscribe.test.message' : 'unsubscribe.success.message')}
+            </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link
-              to="/"
-              className="flex items-center gap-2 border border-border px-6 py-3 rounded-full font-semibold hover:border-primary transition-colors"
-            >
-              <ArrowLeft size={18} />
-              {t('unsubscribe.success.back')}
-            </Link>
+            {backHome}
             <Link
               to="/join"
               className="bg-primary text-white px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform"
@@ -82,19 +103,23 @@ export const Unsubscribe: React.FC = () => {
               {t('unsubscribe.invalid.message', { email: configUrl.contactEmail })}
             </p>
           </div>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 border border-border px-6 py-3 rounded-full font-semibold hover:border-primary transition-colors"
-          >
-            <ArrowLeft size={18} />
-            {t('unsubscribe.success.back')}
-          </Link>
+          {backHome}
         </div>
       );
     }
 
     return (
       <div className="bg-card border border-border p-8 md:p-10 rounded-[2.5rem] space-y-8">
+        {isTest && (
+          <div className="flex items-center gap-3 text-primary bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+            <FlaskConical size={20} className="flex-shrink-0" />
+            <p className="text-sm font-medium">
+              <span className="font-bold">{t('unsubscribe.test.badge')} — </span>
+              {t('unsubscribe.test.notice')}
+            </p>
+          </div>
+        )}
+
         <div className="text-center space-y-4">
           <HeartCrack className="text-primary mx-auto" size={48} />
           <h2 className="text-2xl md:text-3xl font-bold">{t('unsubscribe.confirm.question')}</h2>
