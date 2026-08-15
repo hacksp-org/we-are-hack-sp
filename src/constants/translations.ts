@@ -148,7 +148,6 @@ export const translations = {
     "register.verify.invalid": "Código incorreto ou expirado. Confira e tente de novo.",
     "register.verify.tooMany": "Muitas tentativas seguidas. Aguarde um pouco antes de tentar seu código de novo.",
     "register.verify.missing": "Não encontramos essa inscrição. Comece de novo.",
-    "register.verify.emailFailed": "Sua inscrição foi salva, mas o e-mail com o código não saiu. Use o botão de reenviar abaixo.",
     "register.verify.restart": "Começar de novo",
 
     "register.dependents.title": "Adicione quem vai participar",
@@ -159,10 +158,12 @@ export const translations = {
     "register.dependents.finish": "Concluir inscrição",
     "register.dependents.error": "Não foi possível adicionar. Tente novamente.",
     "register.dependents.unverified": "Confirme seu e-mail antes de adicionar dependentes.",
+    "register.dependents.badSig": "Não foi possível validar sua inscrição. Comece de novo para adicionar dependentes.",
 
     "register.error.duplicate": "Este e-mail já está inscrito.",
     "register.error.invalid": "Confira os campos — algum dado não foi aceito.",
     "register.error.rateLimit": "Muitas tentativas. Aguarde um instante e tente de novo.",
+    "register.error.emailFailed": "Sua inscrição foi salva, mas não conseguimos enviar o e-mail com o código. Fale com a gente em {email} para concluir.",
     "register.error.generic": "Não foi possível enviar sua inscrição. Tente novamente em instantes.",
 
     "register.success.title": "Inscrição concluída!",
@@ -339,7 +340,6 @@ export const translations = {
     "register.verify.invalid": "Wrong or expired code. Please check it and try again.",
     "register.verify.tooMany": "Too many attempts in a row. Please wait a moment before trying your code again.",
     "register.verify.missing": "We couldn't find this registration. Please start over.",
-    "register.verify.emailFailed": "Your registration was saved, but the email with the code didn't go out. Use the resend button below.",
     "register.verify.restart": "Start over",
 
     "register.dependents.title": "Add who's taking part",
@@ -350,10 +350,12 @@ export const translations = {
     "register.dependents.finish": "Finish registration",
     "register.dependents.error": "We couldn't add them. Please try again.",
     "register.dependents.unverified": "Confirm your email before adding dependents.",
+    "register.dependents.badSig": "We couldn't validate your registration. Please start over to add dependents.",
 
     "register.error.duplicate": "This email is already registered.",
     "register.error.invalid": "Please check the fields — some data wasn't accepted.",
     "register.error.rateLimit": "Too many attempts. Please wait a moment and try again.",
+    "register.error.emailFailed": "Your registration was saved, but we couldn't send the email with the code. Reach out to us at {email} to finish it.",
     "register.error.generic": "We couldn't submit your registration. Please try again in a moment.",
 
     "register.success.title": "Registration complete!",

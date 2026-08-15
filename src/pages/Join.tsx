@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { apiUrl } from '../config/config';
+import { apiUrl, configUrl } from '../config/config';
 import hDark from '../assets/h_dark.svg';
 import hLight from '../assets/h_light.svg';
 import {
@@ -94,15 +94,27 @@ export const Join: React.FC = () => {
     if (httpStatus === 409) return 'register.error.duplicate';
     if (httpStatus === 422) return 'register.error.invalid';
     if (httpStatus === 429) return 'register.error.rateLimit';
+    // The registration is saved but no id comes back, so resending is not an option here.
+    if (httpStatus === 502) return 'register.error.emailFailed';
     return 'register.error.generic';
   };
 
-  const startVerification = (registration: PendingRegistration, emailFailed: boolean) => {
+  const startVerification = (registration: PendingRegistration) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(registration));
     setPending(registration);
-    setError(emailFailed ? t('register.verify.emailFailed') : null);
+    setError(null);
     setNotice(null);
     setStep('verify');
+  };
+
+  // Reached once the email is confirmed, whether just now or on an earlier try.
+  const finishVerification = (verifiedCategory: RegistrationCategory) => {
+    if (verifiedCategory === 'guardian') {
+      setStep('dependents');
+      return;
+    }
+    localStorage.removeItem(STORAGE_KEY);
+    setStep('done');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -125,19 +137,13 @@ export const Join: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      const body = await res.json().catch(() => null);
-
-      // A failed verification email still leaves the registration saved, so the
-      // code screen opens anyway and offers the resend button.
-      if (res.ok || (res.status === 502 && body?.id && body?.sig)) {
-        startVerification(
-          { id: body.id, sig: body.sig, email: payload.email, category },
-          res.status === 502
-        );
+      if (res.ok) {
+        const body = await res.json();
+        startVerification({ id: body.id, sig: body.sig, email: payload.email, category });
         return;
       }
 
-      setError(t(errorKeyForStatus(res.status)));
+      setError(t(errorKeyForStatus(res.status), { email: configUrl.contactEmail }));
     } catch {
       setError(t('register.error.generic'));
     } finally {
@@ -161,12 +167,7 @@ export const Join: React.FC = () => {
       });
 
       if (res.ok) {
-        if (pending.category === 'guardian') {
-          setStep('dependents');
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
-          setStep('done');
-        }
+        finishVerification(pending.category);
         return;
       }
 
@@ -192,8 +193,11 @@ export const Join: React.FC = () => {
       const res = await fetch(apiUrl.resendCode(pending.id), { method: 'POST' });
 
       if (res.ok) setNotice(t('register.verify.resent'));
+      // Already verified: there is nothing left to confirm, so move on.
+      else if (res.status === 409) finishVerification(pending.category);
       else if (res.status === 429) setError(t('register.verify.tooMany'));
       else if (res.status === 404) setError(t('register.verify.missing'));
+      else if (res.status === 502) setError(t('register.error.emailFailed', { email: configUrl.contactEmail }));
       else setError(t('register.error.generic'));
     } catch {
       setError(t('register.error.generic'));
@@ -226,8 +230,10 @@ export const Join: React.FC = () => {
         return;
       }
 
-      if (res.status === 403) setError(t('register.dependents.unverified'));
+      if (res.status === 400) setError(t('register.dependents.badSig'));
+      else if (res.status === 403) setError(t('register.dependents.unverified'));
       else if (res.status === 404) setError(t('register.verify.missing'));
+      else if (res.status === 429) setError(t('register.error.rateLimit'));
       else setError(t('register.dependents.error'));
     } catch {
       setError(t('register.dependents.error'));
