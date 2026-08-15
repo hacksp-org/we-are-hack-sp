@@ -4,8 +4,10 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { configUrl } from '../config/config';
 import { HeartCrack, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Link2Off, FlaskConical } from 'lucide-react';
 
-const SUBSCRIBE_ENDPOINT = import.meta.env.VITE_SUBSCRIBE_ENDPOINT;
-const UNSUBSCRIBE_ENDPOINT = `${SUBSCRIBE_ENDPOINT?.replace(/\/$/, '')}/unsubscribe`;
+// VITE_SUBSCRIBE_ENDPOINT may hold either the API origin or the full
+// subscribers endpoint, so only its origin is reused to build the path below.
+const API_ORIGIN = new URL(import.meta.env.VITE_SUBSCRIBE_ENDPOINT).origin;
+const UNSUBSCRIBE_ENDPOINT = `${API_ORIGIN}/api/subscribers/unsubscribe`;
 
 export const Unsubscribe: React.FC = () => {
   const { t, setLanguage } = useLanguage();
