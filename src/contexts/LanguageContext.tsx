@@ -4,6 +4,7 @@ import { translations, type Language, type TranslationKey } from "../constants/t
 interface LanguageContextType {
   language: Language;
   toggleLanguage: () => void;
+  setLanguage: (language: Language) => void;
   t: (key: TranslationKey, variables?: Record<string, string>) => string;
 }
 
@@ -26,7 +27,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return text;
   };
 
-  const value = useMemo(() => ({ language, toggleLanguage, t }), [language]);
+  const value = useMemo(() => ({ language, toggleLanguage, setLanguage, t }), [language]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }

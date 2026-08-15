@@ -8,6 +8,7 @@ import { Support } from '../pages/Support';
 import { FAQ } from '../pages/FAQ';
 import { EventPage } from '../pages/events/EventPage';
 import { Join } from '../pages/Join';
+import { Unsubscribe } from '../pages/Unsubscribe';
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: 'join',
         element: <Join />,
+      },
+      {
+        path: 'unsubscribe',
+        element: <Unsubscribe />,
       },
       {
         path: ':eventId',

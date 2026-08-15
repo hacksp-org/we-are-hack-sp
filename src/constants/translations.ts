@@ -98,7 +98,23 @@ export const translations = {
     "join.form.submitting": "Enviando...",
     "join.success.title": "Inscrição confirmada!",
     "join.success.message": "Recebemos seus dados. Em breve entraremos em contato com novidades sobre os próximos hackathons.",
-    "join.error": "Não foi possível enviar sua inscrição. Tente novamente em instantes."
+    "join.error": "Não foi possível enviar sua inscrição. Tente novamente em instantes.",
+
+    "unsubscribe.title": "Cancelar inscrição",
+    "unsubscribe.subtitle": "Antes de você ir, um último check-in.",
+    "unsubscribe.confirm.question": "Tem certeza que quer cancelar sua inscrição?",
+    "unsubscribe.confirm.p1": "Você vai deixar de receber os convites dos próximos hackathons, as chamadas de mentoria e as novidades da comunidade Hack SP.",
+    "unsubscribe.confirm.p2": "Sem ressentimentos — a porta continua aberta. Se um dia der vontade de construir com a gente de novo, é só se inscrever outra vez.",
+    "unsubscribe.form.confirm": "Sim, cancelar minha inscrição",
+    "unsubscribe.form.submitting": "Cancelando...",
+    "unsubscribe.form.keep": "Mudei de ideia, quero continuar",
+    "unsubscribe.success.title": "Inscrição cancelada",
+    "unsubscribe.success.message": "Pronto, removemos seu e-mail da nossa lista. Obrigado por ter feito parte do Hack SP — e boa sorte no que vier a seguir.",
+    "unsubscribe.success.back": "Voltar para a home",
+    "unsubscribe.success.rejoin": "Quero me inscrever de novo",
+    "unsubscribe.error": "Não foi possível cancelar sua inscrição. Tente novamente em instantes.",
+    "unsubscribe.invalid.title": "Link inválido ou expirado",
+    "unsubscribe.invalid.message": "Este link de cancelamento não é mais válido. Abra o link direto do e-mail que você recebeu — se o problema continuar, fale com a gente em {email}."
   },
   en: {
     "nav.hackathons": "Hackathons",
@@ -200,7 +216,23 @@ export const translations = {
     "join.form.submitting": "Sending...",
     "join.success.title": "Signup confirmed!",
     "join.success.message": "We've received your details. We'll be in touch soon with news about upcoming hackathons.",
-    "join.error": "We couldn't submit your signup. Please try again in a moment."
+    "join.error": "We couldn't submit your signup. Please try again in a moment.",
+
+    "unsubscribe.title": "Unsubscribe",
+    "unsubscribe.subtitle": "Before you go, one last check-in.",
+    "unsubscribe.confirm.question": "Are you sure you want to unsubscribe?",
+    "unsubscribe.confirm.p1": "You'll stop receiving invites to upcoming hackathons, mentorship calls, and news from the Hack SP community.",
+    "unsubscribe.confirm.p2": "No hard feelings — the door stays open. If you ever feel like building with us again, just sign up once more.",
+    "unsubscribe.form.confirm": "Yes, unsubscribe me",
+    "unsubscribe.form.submitting": "Unsubscribing...",
+    "unsubscribe.form.keep": "I changed my mind, keep me in",
+    "unsubscribe.success.title": "Subscription cancelled",
+    "unsubscribe.success.message": "Done — we've removed your email from our list. Thank you for being part of Hack SP, and good luck with whatever comes next.",
+    "unsubscribe.success.back": "Back to home",
+    "unsubscribe.success.rejoin": "I want to sign up again",
+    "unsubscribe.error": "We couldn't cancel your subscription. Please try again in a moment.",
+    "unsubscribe.invalid.title": "Invalid or expired link",
+    "unsubscribe.invalid.message": "This unsubscribe link is no longer valid. Please open the link straight from the email you received — if it keeps failing, reach out to us at {email}."
   },
 } as const;
 
