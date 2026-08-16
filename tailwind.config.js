@@ -14,6 +14,9 @@ export default {
         secondary: 'var(--secondary)',
         border: 'var(--border)',
         card: 'var(--card)',
+        hairline: 'var(--hairline)',
+        muted: 'var(--muted)',
+        hover: 'var(--hover)',
       },
       animation: {
         'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

@@ -8,6 +8,10 @@
   --primary: #ff0000;
   --border: rgba(0, 0, 0, 0.04); /* Opacidade bem baixinha para o grid */
   --card: #f2f2f2;
+  /* Tons translúcidos prontos: o Tailwind não aplica opacidade sobre var() cru */
+  --hairline: rgba(0, 0, 0, 0.08);
+  --muted: rgba(0, 0, 0, 0.2);
+  --hover: rgba(0, 0, 0, 0.04);
 }
 
 .dark {
@@ -16,6 +20,9 @@
   --primary: #ff0000;
   --border: rgba(255, 255, 255, 0.04); /* Opacidade bem baixinha para o grid */
   --card: #161616;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --muted: rgba(255, 255, 255, 0.2);
+  --hover: rgba(255, 255, 255, 0.04);
 }
 
 @layer base {
