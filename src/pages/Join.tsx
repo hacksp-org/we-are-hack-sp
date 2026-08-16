@@ -10,12 +10,14 @@ import {
   categoryFields,
   commonFields,
   dependentFields,
+  OTHER_OPTION_VALUE,
   type FieldConfig,
   type RegistrationCategory,
 } from '../constants/registration';
 import {
   ArrowLeft,
   ArrowRight,
+  ChevronDown,
   Loader2,
   CheckCircle2,
   AlertCircle,
@@ -23,6 +25,30 @@ import {
   Plus,
   Send,
 } from 'lucide-react';
+
+const onlyDigits = (value: string) => value.replace(/\D/g, '');
+
+// Reformatted from the raw digits on every keystroke, so paste and delete
+// both land on a valid mask instead of drifting out of sync with it.
+const maskCpf = (value: string) =>
+  onlyDigits(value)
+    .slice(0, 11)
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+const maskCnpj = (value: string) =>
+  onlyDigits(value)
+    .slice(0, 14)
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+
+const FIELD_MASKS: Partial<Record<string, (value: string) => string>> = {
+  cpf: maskCpf,
+  cnpj: maskCnpj,
+};
 
 type Step = 'category' | 'personal' | 'details' | 'verify' | 'dependents' | 'done';
 
@@ -47,7 +73,8 @@ const readPending = (): PendingRegistration | null => {
 };
 
 const inputClasses =
-  'w-full bg-background rounded-xl px-4 py-3.5 text-foreground border border-transparent placeholder:opacity-30 focus:outline-none focus:border-primary transition-colors';
+  'w-full bg-background rounded-xl px-4 py-3.5 text-foreground border border-transparent placeholder:opacity-30 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all';
+const selectClasses = `${inputClasses} appearance-none cursor-pointer`;
 const labelClasses = 'block text-xs font-medium uppercase tracking-wider mb-2 opacity-45';
 // The panel around each step is the card, so a step is just stacked content.
 const cardClasses = 'space-y-6';
@@ -89,6 +116,19 @@ export const Join: React.FC = () => {
   const stepNumber: Record<Step, number> = { category: 1, personal: 2, details: 3, verify: 4, dependents: 5, done: 5 };
 
   const setValue = (name: string, value: string) => setValues((prev) => ({ ...prev, [name]: value }));
+  const setDependentField = (name: string, value: string) =>
+    setDependent((prev) => ({ ...prev, [name]: value }));
+
+  // `values[field.name]` holds an option code (e.g. "mother"), not text — the
+  // API gets whatever that code translates to in the language the person is
+  // using, or their own words when they picked "other".
+  const resolveFieldValue = (field: FieldConfig, source: Record<string, string>): string => {
+    if (field.type !== 'select') return source[field.name]?.trim() ?? '';
+    const selected = source[field.name];
+    if (selected === OTHER_OPTION_VALUE) return source[`${field.name}_other`]?.trim() ?? '';
+    const option = field.options?.find((candidate) => candidate.value === selected);
+    return option ? t(option.labelKey) : '';
+  };
 
   const errorKeyForStatus = (httpStatus: number) => {
     if (httpStatus === 409) return 'register.error.duplicate';
@@ -126,9 +166,9 @@ export const Join: React.FC = () => {
     setError(null);
 
     const payload: Record<string, string> = { category };
-    [...commonFields, ...detailFields].forEach(({ name, optional }) => {
-      const value = values[name]?.trim();
-      if (value || !optional) payload[name] = value ?? '';
+    [...commonFields, ...detailFields].forEach((field) => {
+      const value = resolveFieldValue(field, values);
+      if (value || !field.optional) payload[field.name] = value;
     });
 
     try {
@@ -233,7 +273,7 @@ export const Join: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sig: pending.sig,
-          ...Object.fromEntries(dependentFields.map(({ name }) => [name, dependent[name]?.trim() ?? ''])),
+          ...Object.fromEntries(dependentFields.map((field) => [field.name, resolveFieldValue(field, dependent)])),
         }),
       });
 
@@ -271,29 +311,90 @@ export const Join: React.FC = () => {
     setStep('done');
   };
 
-  const renderField = (field: FieldConfig, value: string, onChange: (v: string) => void, idPrefix = '') => (
-    <div key={`${idPrefix}${field.name}`}>
-      <label htmlFor={`${idPrefix}${field.name}`} className={labelClasses}>
+  const renderField = (
+    field: FieldConfig,
+    values: Record<string, string>,
+    setField: (name: string, value: string) => void,
+    idPrefix = '',
+  ) => {
+    const id = `${idPrefix}${field.name}`;
+    const value = values[field.name] ?? '';
+    const label = (
+      <label htmlFor={id} className={labelClasses}>
         {t(field.labelKey)}
         {field.optional && <span className="opacity-50 font-normal"> ({t('register.optional')})</span>}
       </label>
-      <input
-        id={`${idPrefix}${field.name}`}
-        type={field.type}
-        required={!field.optional}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={field.placeholderKey ? t(field.placeholderKey) : undefined}
-        className={inputClasses}
-      />
-    </div>
-  );
+    );
+
+    if (field.type === 'select') {
+      const isOther = value === OTHER_OPTION_VALUE;
+      return (
+        <div key={id} className="space-y-3">
+          <div>
+            {label}
+            <div className="relative">
+              <select
+                id={id}
+                required={!field.optional}
+                value={value}
+                onChange={(e) => setField(field.name, e.target.value)}
+                className={selectClasses}
+              >
+                <option value="" disabled>
+                  {field.placeholderKey ? t(field.placeholderKey) : ''}
+                </option>
+                {field.options?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(option.labelKey)}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={18}
+                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-40"
+              />
+            </div>
+          </div>
+
+          {isOther && (
+            <input
+              id={`${id}-other`}
+              type="text"
+              required
+              autoFocus
+              value={values[`${field.name}_other`] ?? ''}
+              onChange={(e) => setField(`${field.name}_other`, e.target.value)}
+              placeholder={t('register.field.relationship.other.placeholder')}
+              className={`${inputClasses} animate-in fade-in slide-in-from-top-1 duration-300`}
+            />
+          )}
+        </div>
+      );
+    }
+
+    const mask = FIELD_MASKS[field.name];
+    return (
+      <div key={id}>
+        {label}
+        <input
+          id={id}
+          type={field.type}
+          inputMode={mask ? 'numeric' : undefined}
+          required={!field.optional}
+          value={value}
+          onChange={(e) => setField(field.name, mask ? mask(e.target.value) : e.target.value)}
+          placeholder={field.placeholderKey ? t(field.placeholderKey) : undefined}
+          className={inputClasses}
+        />
+      </div>
+    );
+  };
 
   const feedback = useMemo(() => {
     if (!error && !notice) return null;
 
     return (
-      <div className="flex items-center gap-3 text-primary bg-background rounded-xl px-4 py-3">
+      <div className="flex items-center gap-3 text-primary bg-background rounded-xl px-4 py-3 animate-in fade-in slide-in-from-top-1 duration-300">
         {error ? (
           <AlertCircle size={20} className="flex-shrink-0" />
         ) : (
@@ -308,7 +409,7 @@ export const Join: React.FC = () => {
     if (step === 'done') {
       return (
         <div className="space-y-6">
-          <CheckCircle2 className="text-primary" size={40} />
+          <CheckCircle2 className="text-primary animate-pop-in" size={40} />
           <div className="space-y-2">
             <h2 className="text-xl font-semibold">{t('register.success.title')}</h2>
             <p className="text-sm opacity-50">{t('register.success.message')}</p>
@@ -327,7 +428,7 @@ export const Join: React.FC = () => {
           <h2 className="text-xl font-semibold">{t('register.category.title')}</h2>
 
           <div className="-mx-3 divide-y divide-hairline">
-            {categories.map(({ id, icon: Icon, labelKey, descKey }) => (
+            {categories.map(({ id, icon: Icon, labelKey, descKey }, index) => (
               <button
                 key={id}
                 type="button"
@@ -335,9 +436,10 @@ export const Join: React.FC = () => {
                   setCategory(id);
                   setStep('personal');
                 }}
-                className="group w-full flex items-center gap-4 text-left px-3 py-4 hover:bg-hover transition-colors"
+                style={{ animationDelay: `${index * 60}ms` }}
+                className="group w-full flex items-center gap-4 text-left px-3 py-4 hover:bg-hover transition-colors animate-in fade-in slide-in-from-left-4 fill-mode-both duration-500"
               >
-                <Icon size={20} className="text-primary flex-shrink-0" />
+                <Icon size={20} className="text-primary flex-shrink-0 transition-transform group-hover:scale-110" />
                 <span className="flex-1 min-w-0">
                   <span className="block font-medium">{t(labelKey)}</span>
                   <span className="block text-sm opacity-45">{t(descKey)}</span>
@@ -374,7 +476,7 @@ export const Join: React.FC = () => {
           </h2>
 
           <div className="space-y-6">
-            {fields.map((field) => renderField(field, values[field.name] ?? '', (v) => setValue(field.name, v)))}
+            {fields.map((field) => renderField(field, values, setValue))}
           </div>
 
           {feedback}
@@ -497,14 +599,7 @@ export const Join: React.FC = () => {
         )}
 
         <form onSubmit={handleAddDependent} className="space-y-6">
-          {dependentFields.map((field) =>
-            renderField(
-              field,
-              dependent[field.name] ?? '',
-              (v) => setDependent((prev) => ({ ...prev, [field.name]: v })),
-              'dependent-'
-            )
-          )}
+          {dependentFields.map((field) => renderField(field, dependent, setDependentField, 'dependent-'))}
 
           {feedback}
 
@@ -561,7 +656,10 @@ export const Join: React.FC = () => {
         {/* The card is a fixed 16:9 box, so a long step scrolls inside it. */}
         <section className="flex flex-col justify-center gap-8 p-8 sm:p-10 md:p-12 md:overflow-y-auto">
           <h1 className="text-xs font-medium uppercase tracking-[0.2em] opacity-35">{t('register.title')}</h1>
-          {renderStep()}
+          {/* Keyed by step so each transition replays the entrance instead of just swapping content. */}
+          <div key={step} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {renderStep()}
+          </div>
         </section>
       </div>
     </div>

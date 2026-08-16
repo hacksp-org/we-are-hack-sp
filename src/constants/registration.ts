@@ -3,13 +3,23 @@ import { Users, GraduationCap, Backpack, School, Handshake, type LucideIcon } fr
 
 export type RegistrationCategory = 'guardian' | 'teacher' | 'student' | 'school' | 'partner';
 
+export interface FieldOption {
+  /** Código estável guardado no estado do form — o texto enviado à API vem de `labelKey`, traduzido no idioma ativo. */
+  value: string;
+  labelKey: TranslationKey;
+}
+
 export interface FieldConfig {
   name: string;
-  type: 'text' | 'email' | 'tel' | 'date';
+  type: 'text' | 'email' | 'tel' | 'date' | 'select';
   labelKey: TranslationKey;
   placeholderKey?: TranslationKey;
   optional?: boolean;
+  /** Só para type: 'select'. A opção de value 'other' revela um campo de texto livre ao lado. */
+  options?: FieldOption[];
 }
+
+export const OTHER_OPTION_VALUE = 'other';
 
 export const commonFields: FieldConfig[] = [
   {
@@ -38,9 +48,18 @@ export const categoryFields: Record<RegistrationCategory, FieldConfig[]> = {
     { name: 'cpf', type: 'text', labelKey: 'register.field.cpf', placeholderKey: 'register.field.cpf.placeholder' },
     {
       name: 'relationship',
-      type: 'text',
+      type: 'select',
       labelKey: 'register.field.relationship',
-      placeholderKey: 'register.field.relationship.placeholder',
+      placeholderKey: 'register.field.relationship.select',
+      options: [
+        { value: 'mother', labelKey: 'register.field.relationship.mother' },
+        { value: 'father', labelKey: 'register.field.relationship.father' },
+        { value: 'grandmother', labelKey: 'register.field.relationship.grandmother' },
+        { value: 'grandfather', labelKey: 'register.field.relationship.grandfather' },
+        { value: 'uncleAunt', labelKey: 'register.field.relationship.uncleAunt' },
+        { value: 'legalGuardian', labelKey: 'register.field.relationship.legalGuardian' },
+        { value: OTHER_OPTION_VALUE, labelKey: 'register.field.relationship.other' },
+      ],
     },
   ],
   teacher: [
