@@ -364,7 +364,7 @@ export const Join: React.FC = () => {
               autoFocus
               value={values[`${field.name}_other`] ?? ''}
               onChange={(e) => setField(`${field.name}_other`, e.target.value)}
-              placeholder={t('register.field.relationship.other.placeholder')}
+              placeholder={t('register.field.other.placeholder')}
               className={`${inputClasses} animate-in fade-in slide-in-from-top-1 duration-300`}
             />
           )}
