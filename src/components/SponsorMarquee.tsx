@@ -13,8 +13,6 @@ export function SponsorMarquee() {
             className="flex shrink-0 items-center"
           >
             {sponsors.map((sponsor) => {
-              const monochrome = sponsor.monochrome !== false;
-
               return (
                 <div
                   key={`${group}-${sponsor.alt}`}
