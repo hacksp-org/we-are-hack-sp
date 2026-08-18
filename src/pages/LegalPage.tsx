@@ -1,7 +1,7 @@
 import { useLanguage } from '../contexts/LanguageContext';
 import { useReveal } from '../hooks/useReveal';
 import type { LegalBlock, LegalDocument } from '../constants/legal';
-import brandMarkRed from '../assets/brand/brand-mark-red.png';
+import { brand } from '../constants/cdn';
 
 /**
  * Opening band, then a 250px sticky index beside the text. The index is the
@@ -16,7 +16,7 @@ export function LegalPage({ document }: { document: LegalDocument }) {
       <section className="border-b border-line bg-surface-alt">
         <div className="mx-auto max-w-[900px] px-7 pb-[60px] pt-[72px]">
           <div className="mb-5 flex items-center gap-3">
-            <img src={brandMarkRed} alt="" className="block h-[22px] w-auto" />
+            <img src={brand.markRed} alt="" className="block h-[22px] w-auto" />
             <p className="eyebrow m-0 text-primary">{document.eyebrow[language]}</p>
           </div>
           <h1 className="m-0 mb-[22px] font-display text-[32px] font-extrabold leading-[1.18] tracking-[-0.02em] md:text-[44px]">

@@ -7,8 +7,7 @@ import { DiscordIcon } from '../components/icons';
 import { SponsorMarquee } from '../components/SponsorMarquee';
 import { sponsors } from '../constants/sponsors';
 import { useEvents } from '../hooks/useEvents';
-import brandMarkRed from '../assets/brand/brand-mark-red.png';
-import brandMarkWhite from '../assets/brand/brand-mark-white.png';
+import { brand } from '../constants/cdn';
 import heroPhoto from '../assets/events/hero.jpeg';
 
 export function Home() {
@@ -49,7 +48,7 @@ function Hero() {
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#00000036,#0000009A)]" />
       <img
-        src={brandMarkRed}
+        src={brand.markRed}
         alt=""
         className="absolute -right-[60px] top-10 hidden h-[340px] w-auto opacity-[0.22] md:block"
       />
@@ -57,7 +56,7 @@ function Hero() {
       <div className="relative z-[2] mx-auto max-w-shell px-7 pb-24 pt-[104px]">
         <div data-reveal className="max-w-[900px]">
           <div className="mb-[22px] flex items-center gap-3.5">
-            <img src={brandMarkWhite} alt="" className="block h-[26px] w-auto" />
+            <img src={brand.markWhite} alt="" className="block h-[26px] w-auto" />
             <p className="eyebrow m-0 text-white">{t('home.eyebrow')}</p>
           </div>
 
@@ -114,7 +113,7 @@ function Hero() {
 function SectionHeading({ number, title }: { number: string; title: string }) {
   return (
     <div data-reveal className="mb-11 flex items-baseline gap-4">
-      <img src={brandMarkRed} alt="" className="block h-5 w-auto self-center" />
+      <img src={brand.markRed} alt="" className="block h-5 w-auto self-center" />
       <span className="text-[13px] font-bold tracking-[0.16em] text-primary">{number}</span>
       <h2 className="m-0 font-display text-[30px] font-bold md:text-[40px]">{title}</h2>
     </div>
@@ -154,7 +153,7 @@ function Community() {
             className="relative flex flex-col gap-[18px] overflow-hidden rounded-2xl bg-dark px-8 py-[34px]"
           >
             <img
-              src={brandMarkWhite}
+              src={brand.markWhite}
               alt=""
               className="absolute -bottom-[34px] -right-7 block h-40 w-auto opacity-[0.12]"
             />
@@ -377,7 +376,7 @@ function Sponsors() {
     <section id="sponsors" className="section-anchor border-t border-line bg-surface-alt">
       <div className="mx-auto max-w-shell px-7 py-[72px]">
         <div data-reveal className="mb-3 flex items-center gap-3">
-          <img src={brandMarkRed} alt="" className="block h-5 w-auto" />
+          <img src={brand.markRed} alt="" className="block h-5 w-auto" />
           <p className="eyebrow m-0 text-primary">{t('sponsors.eyebrow')}</p>
         </div>
         <h2 data-reveal className="m-0 mb-9 font-display text-[32px] font-bold">
