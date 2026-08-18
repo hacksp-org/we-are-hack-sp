@@ -7,8 +7,7 @@
  * entrega do edge com cache longo — o build deixa de crescer a cada logo.
  *
  * Fotos de evento não passam por aqui: elas são dinâmicas e vêm do repositório
- * `events`. A bandeira do Hack Club também fica no repo — não é marca do Hack SP
- * e não está no bucket.
+ * `events`.
  */
 const CDN_URL = import.meta.env.VITE_CDN_URL || 'https://cdn.hacksp.org';
 
@@ -21,4 +20,6 @@ export const brand = {
   markWhite: cdn('brand/marks/brand-mark-white.png'),
   logoHorizontalWhite: cdn('brand/logos/logo-horizontal-white-red.png'),
   logoHorizontalBlack: cdn('brand/logos/logo-horizontal-black-red.png'),
+  /** Bandeira do Hack Club, no rodapé — a arte é a mesma do logo de patrocinador. */
+  hackclubFlag: cdn('sponsors/hackclub-white.png'),
 } as const;
