@@ -1,131 +1,77 @@
-import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Sun, Moon, Menu, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { configUrl } from "../config/config.ts";
-import hDark from '../assets/h_dark.svg';
-import hLight from '../assets/h_light.svg';
+import { configUrl } from '../config/config';
+import { GitHubIcon } from './icons';
+import logoHorizontal from '../assets/brand/logo-horizontal-black-red.png';
 
-export const Header: React.FC = () => {
+const NAV = [
+  { href: '#comunidade', key: 'nav.community' },
+  { href: '#sobre', key: 'nav.about' },
+  { href: '#transparencia', key: 'nav.transparency' },
+  { href: '#apoie', key: 'nav.support' },
+] as const;
+
+/**
+ * Sticky, 73px, under the 4px red rule that runs across the top of the page.
+ * Navigation is anchors into the single-page home, not routes.
+ */
+export function Header() {
   const { language, toggleLanguage, t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const navLinks = [
-    { to: "/hackathons", label: t('nav.hackathons') },
-    { to: "/about", label: t('nav.about') },
-    { to: "/transparency", label: t('nav.transparency') },
-    { to: "/support", label: t('nav.support') },
-    { to: "/faq", label: t('nav.faq') },
-  ];
 
   return (
-    <header className="sticky top-0 z-[50] border-b border-border px-6 md:px-12 py-4 bg-background">
-      <div className="max-w-[1400px] mx-auto flex justify-between items-center">
-        <Link to="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
-          <img 
-            src={theme === 'dark' ? hDark : hLight} 
-            alt="Hack-SP Logo" 
-            className="h-10 transition-opacity hover:opacity-80" 
-          />
-        </Link>
-        
-        <nav className="hidden lg:flex gap-8 items-center">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.to} 
-              to={link.to} 
-              className="no-underline text-foreground/70 font-medium transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            to="/join"
-            className="bg-primary text-white px-5 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform"
-          >
-            {t('nav.join')}
-          </Link>
-        </nav>
+    <>
+      <div className="h-1 bg-primary" />
+      <header className="sticky top-0 z-50 h-[73px] border-b border-line bg-surface">
+        <div className="mx-auto flex h-full max-w-shell items-center justify-between gap-6 px-7">
+          <a href="#top" className="flex shrink-0 items-center gap-3">
+            <img
+              src={logoHorizontal}
+              alt="Hack SP"
+              className="block h-[38px] w-[133px] object-contain"
+            />
+          </a>
 
-        <div className="flex items-center gap-4 md:gap-6">
-          <div className="hidden sm:flex items-center gap-4 md:gap-6">
-            <a href={configUrl.githubUrl} target="_blank" rel="noopener noreferrer" className="text-foreground flex items-center hover:opacity-70 transition-opacity">
-              <Github size={24} />
-            </a>
-            <button 
-              onClick={toggleTheme} 
-              className="p-2 rounded-full hover:bg-foreground/10 transition-colors"
-              aria-label="Toggle Theme"
-            >
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            <button 
-              onClick={toggleLanguage} 
-              className="bg-transparent border border-foreground text-foreground px-3 py-1 rounded font-semibold hover:bg-foreground hover:text-background transition-colors"
-            >
-              {language === 'pt' ? 'EN' : 'PT'}
-            </button>
-          </div>
-
-          <button 
-            className="lg:hidden p-2 text-foreground"
-            onClick={toggleMenu}
-            aria-label="Toggle Menu"
-          >
-            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-background border-b border-border py-6 px-6 flex flex-col gap-6 animate-in fade-in slide-in-from-top-2 duration-300 ease-out">
-          {navLinks.map((link, index) => (
-            <Link 
-              key={link.to} 
-              to={link.to} 
-              className="no-underline text-foreground/70 font-medium text-lg animate-in fade-in slide-in-from-left-4 fill-mode-both"
-              style={{ animationDelay: `${index * 50}ms` }}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            to="/join"
-            className="bg-primary text-white px-5 py-3 rounded-xl font-bold text-center animate-in fade-in slide-in-from-left-4 fill-mode-both"
-            style={{ animationDelay: `${navLinks.length * 50}ms` }}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            {t('nav.join')}
-          </Link>
-          
-          <div className="flex items-center justify-between pt-4 border-t border-border animate-in fade-in duration-500 delay-200">
-            <div className="flex gap-6">
-              <a href={configUrl.githubUrl} target="_blank" rel="noopener noreferrer" className="text-foreground">
-                <Github size={24} />
-              </a>
-              <button 
-                onClick={toggleTheme} 
-                className="text-foreground"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
-              </button>
+          <nav className="flex items-center gap-4 lg:gap-6">
+            <div className="hidden items-center gap-6 lg:flex">
+              {NAV.map(({ href, key }) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
+                >
+                  {t(key)}
+                </a>
+              ))}
+              <span className="h-[22px] w-px bg-line" />
             </div>
-            <button 
-              onClick={toggleLanguage} 
-              className="bg-transparent border border-foreground text-foreground px-4 py-1.5 rounded font-semibold"
+
+            <a
+              href={configUrl.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              className="flex items-center text-ink transition-colors hover:text-primary"
+            >
+              <GitHubIcon size={22} />
+            </a>
+
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="rounded-lg border-[1.5px] border-ink bg-surface px-3 py-[7px] text-[13px] font-bold tracking-[0.08em] text-ink transition-colors hover:bg-ink hover:text-surface"
             >
               {language === 'pt' ? 'EN' : 'PT'}
             </button>
-          </div>
+
+            <Link
+              to="/join"
+              className="rounded-[10px] border-[1.5px] border-primary bg-primary px-5 py-2.5 text-[15px] font-bold text-white transition-colors hover:border-ink hover:bg-ink"
+            >
+              {t('nav.join')}
+            </Link>
+          </nav>
         </div>
-      )}
-    </header>
+      </header>
+    </>
   );
-};
+}

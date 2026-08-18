@@ -1,369 +1,409 @@
-import React from 'react';
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { TypingTitle } from '../components/TypingTitle';
-import {
-  ArrowRight,
-  Code2,
-  Users,
-  Rocket,
-  Zap,
-  BookOpen,
-  MessageSquare,
-  Presentation,
-  Star,
-  Newspaper,
-  MessageCircle
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { fetchEvents, type EventsMap } from '../constants/events';
-import { news } from '../constants/news';
-import { configUrl } from '../config/config.ts';
+import { useReveal } from '../hooks/useReveal';
+import { configUrl } from '../config/config';
+import { DiscordIcon } from '../components/icons';
+import { SponsorMarquee } from '../components/SponsorMarquee';
+import { sponsors } from '../constants/sponsors';
+import { useEvents } from '../hooks/useEvents';
+import brandMarkRed from '../assets/brand/brand-mark-red.png';
+import brandMarkWhite from '../assets/brand/brand-mark-white.png';
+import heroPhoto from '../assets/events/hero.jpeg';
 
-export const Home: React.FC = () => {
-  const { t, language } = useLanguage();
-
-  const [events, setEvents] = React.useState<EventsMap>({});
-  const [loadingEvents, setLoadingEvents] = React.useState(true);
-
-  React.useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const data = await fetchEvents();
-        setEvents(data);
-      } catch (error) {
-        console.error('Failed to load events:', error);
-      } finally {
-        setLoadingEvents(false);
-      }
-    };
-
-    loadEvents();
-  }, []);
-
-  const pastEvents = Object.values(events)
-    .filter((e) => e.status === 'past')
-    .slice(0, 2);
-
-  const valueIcons = [
-    <Code2 size={32} />,
-    <Users size={32} />,
-    <MessageSquare size={32} />,
-    <Rocket size={32} />
-  ];
-
-  const stepIcons = [
-    <Users size={32} />,
-    <BookOpen size={32} />,
-    <Zap size={32} />,
-    <Presentation size={32} />
-  ];
+export function Home() {
+  useReveal();
 
   return (
-    <div className="page-transition flex flex-col items-center">
-      <section className="flex flex-col items-center justify-center min-h-[80vh] text-center mb-20 px-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out">
-        <TypingTitle
-          part1={t('home.title.part1')}
-          part2={t('home.title.part2')}
-        />
-        <p className="text-xl md:text-3xl opacity-60 max-w-3xl mx-auto leading-relaxed mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 fill-mode-both">
-          {t('home.subtitle')}
-        </p>
-        <div className="flex flex-wrap justify-center gap-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 fill-mode-both">
-          <Link
-            to="/hackathons"
-            className="group flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-xl shadow-primary/20"
+    <>
+      <span id="top" />
+      <Hero />
+      <Community />
+      <About />
+      <Transparency />
+      <Support />
+      <Sponsors />
+    </>
+  );
+}
+
+function Hero() {
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+
+  // The field is a shortcut into the real form, not a second way to register:
+  // whatever is typed here is carried over so nobody types it twice.
+  const goToSignup = (event: FormEvent) => {
+    event.preventDefault();
+    const trimmed = email.trim();
+    navigate(trimmed ? `/join?email=${encodeURIComponent(trimmed)}` : '/join');
+  };
+
+  return (
+    <section className="relative overflow-hidden bg-dark-alt">
+      <img
+        src={heroPhoto}
+        alt=""
+        className="absolute inset-0 block h-full w-full object-cover opacity-[0.38]"
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#00000036,#0000009A)]" />
+      <img
+        src={brandMarkRed}
+        alt=""
+        className="absolute -right-[60px] top-10 hidden h-[340px] w-auto opacity-[0.22] md:block"
+      />
+
+      <div className="relative z-[2] mx-auto max-w-shell px-7 pb-24 pt-[104px]">
+        <div data-reveal className="max-w-[900px]">
+          <div className="mb-[22px] flex items-center gap-3.5">
+            <img src={brandMarkWhite} alt="" className="block h-[26px] w-auto" />
+            <p className="eyebrow m-0 text-white">{t('home.eyebrow')}</p>
+          </div>
+
+          <h1 className="m-0 mb-[26px] font-display text-[38px] font-extrabold leading-[1.14] tracking-[-0.02em] text-white md:text-[58px]">
+            {t('home.title')}
+          </h1>
+
+          <p className="m-0 mb-10 max-w-[760px] text-lg leading-[1.65] text-[#dcdcdc] md:text-xl">
+            {t('home.intro')}
+          </p>
+
+          <form
+            onSubmit={goToSignup}
+            className="flex max-w-[760px] flex-col gap-3.5 rounded-2xl border border-white/[0.14] bg-white/5 p-5"
           >
-            {t('home.cta.primary')}
-            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            to="/support"
-            className="flex items-center gap-2 bg-foreground/5 backdrop-blur-sm border border-border px-8 py-4 rounded-full font-bold text-lg hover:bg-foreground/10 transition-all"
-          >
-            {t('home.cta.secondary')}
-          </Link>
-        </div>
-      </section>
-
-      <section className="w-full max-w-7xl mx-auto space-y-40 py-16 px-4">
-        <div className="space-y-16">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-6xl font-bold">{t('home.values.title')}</h2>
-            <div className="w-24 h-1 bg-primary mx-auto rounded-full" />
-          </div>
-          <div className="grid md:grid-cols-4 gap-8">
-            {[0, 1, 2, 3].map((index) => (
-              <div
-                key={index}
-                className="bg-background/60 dark:bg-background/40 backdrop-blur-md p-8 rounded-3xl border border-border/50 hover:border-primary/50 transition-colors group"
-              >
-                <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  {valueIcons[index]}
-                </div>
-                <h3 className="text-2xl font-bold mb-4">
-                  {t(`home.valueCards.${index}.title` as any)}
-                </h3>
-                <p className="opacity-70 leading-relaxed">
-                  {t(`home.valueCards.${index}.desc` as any)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-foreground/[0.02] rounded-[3rem] p-8 md:p-16 border border-border/50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] -mr-48 -mt-48 rounded-full" />
-          <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <h2 className="text-4xl md:text-6xl font-bold leading-tight">
-                {t('home.how.title')}
-              </h2>
-              <p className="text-xl opacity-70 leading-relaxed max-w-xl">
-                {language === 'pt'
-                  ? 'Transformamos ideias em realidade em um único dia. Proporcionamos todo o suporte necessário para que você foque apenas em criar.'
-                  : 'We turn ideas into reality in a single day. We provide all the support needed so you can focus only on creating.'}
-              </p>
-              <div className="flex pt-4">
-                <Link
-                  to="/faq"
-                  className="text-primary font-bold flex items-center gap-2 hover:gap-3 transition-all"
-                >
-                  {language === 'pt' ? 'Tire suas dúvidas' : 'Check our FAQ'}{' '}
-                  <ArrowRight size={20} />
-                </Link>
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-6">
-              {[0, 1, 2, 3].map((index) => (
-                <div
-                  key={index}
-                  className="bg-background/80 dark:bg-background/60 p-6 rounded-2xl border border-border/50 flex items-start gap-4 shadow-sm"
-                >
-                  <div className="text-primary mt-1">{stepIcons[index]}</div>
-                  <span className="text-lg font-medium">
-                    {t(`home.how.item.${index}` as any)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {news.length > 0 && (
-          <div className="space-y-16">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 text-primary font-bold uppercase tracking-widest text-sm">
-                  <Newspaper size={18} />
-                  {t('home.news.title')}
-                </div>
-                <h2 className="text-4xl md:text-6xl font-bold">
-                  {language === 'pt' ? 'O que está rolando' : "What's happening"}
-                </h2>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {news.map((item) => {
-                const content =
-                  item.translations[language as 'pt' | 'en'] || item.translations.pt;
-                const isExternal = item.link?.startsWith('http');
-
-                const CardContent = (
-                  <>
-                    <div className="absolute inset-0">
-                      <img
-                        src={item.image}
-                        alt={content.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                    </div>
-                    <div className="absolute top-6 left-6">
-                      <span className="bg-primary/20 backdrop-blur-md text-primary border border-primary/30 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                        {content.category}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 p-10 text-white space-y-4">
-                      <h3 className="text-3xl font-bold">{content.title}</h3>
-                      <p className="opacity-80 line-clamp-2 max-w-md">
-                        {content.description}
-                      </p>
-                      <div className="flex items-center gap-2 text-primary font-bold group-hover:gap-3 transition-all">
-                        {t('home.news.cta')}
-                        <ArrowRight size={20} />
-                      </div>
-                    </div>
-                  </>
-                );
-
-                return isExternal ? (
-                  <a
-                    key={item.id}
-                    href={item.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative h-[400px] rounded-[2.5rem] overflow-hidden border border-border/50 shadow-2xl transition-all hover:scale-[1.02] duration-500"
-                  >
-                    {CardContent}
-                  </a>
-                ) : (
-                  <Link
-                    key={item.id}
-                    to={item.link || '#'}
-                    className="group relative h-[400px] rounded-[2.5rem] overflow-hidden border border-border/50 shadow-2xl transition-all hover:scale-[1.02] duration-500"
-                  >
-                    {CardContent}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-primary font-bold uppercase tracking-widest text-sm">
-                <Star size={18} />
-                {language === 'pt' ? 'Histórico' : 'History'}
-              </div>
-              <h2 className="text-4xl md:text-6xl font-bold">{t('home.past.title')}</h2>
-            </div>
-            <Link
-              to="/hackathons"
-              className="group flex items-center gap-2 text-xl font-bold opacity-70 hover:opacity-100 transition-opacity"
-            >
-              {language === 'pt' ? 'Ver histórico completo' : 'View full history'}
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          {loadingEvents ? (
-            <div className="text-center text-lg opacity-60">
-              {language === 'pt' ? 'Carregando eventos...' : 'Loading events...'}
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-8">
-              {pastEvents.map((event) => {
-                const content =
-                  event.translations[language as 'pt' | 'en'] || event.translations.pt;
-
-                return (
-                  <Link
-                    key={event.id}
-                    to={`/${event.id}`}
-                    className="group relative h-[400px] rounded-[2.5rem] overflow-hidden border border-border/50 shadow-2xl transition-all hover:scale-[1.02] duration-500"
-                  >
-                    <div className="absolute inset-0">
-                      <img
-                        src={event.bannerUrl || event.photos[0]}
-                        alt={event.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 p-10 text-white space-y-4">
-                      <div className="flex items-center gap-2 text-primary font-bold">
-                        <Star size={16} fill="currentColor" />
-                        <span className="uppercase tracking-widest text-sm">DESTAQUE</span>
-                      </div>
-                      <h3 className="text-3xl font-bold">{event.name}</h3>
-                      <p className="opacity-80 line-clamp-2 max-w-md">
-                        {content.description}
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="relative overflow-hidden rounded-[3rem] bg-[#5865F2] p-8 md:p-16 text-white border border-white/10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[120px] -mr-48 -mt-48 rounded-full" />
-          <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider">
-                <MessageCircle size={20} />
-                Community
-              </div>
-              <h2 className="text-4xl md:text-6xl font-bold leading-tight">
-                {t('home.discord.title')}
-              </h2>
-              <p className="text-xl md:text-2xl opacity-90 leading-relaxed">
-                {t('home.discord.p1')}
-              </p>
+            <div className="flex flex-wrap gap-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder={t('home.emailPlaceholder')}
+                aria-label={t('home.emailPlaceholder')}
+                className="min-w-[220px] flex-1 rounded-[10px] border-[1.5px] border-white/40 bg-white/10 px-[18px] py-4 text-[17px] text-white placeholder:text-white/60 focus:border-[#ff3b3b] focus:outline-none"
+              />
+              <button type="submit" className="btn btn-primary px-8 py-4 text-[17px]">
+                {t('nav.join')}
+              </button>
               <a
                 href={configUrl.discordUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 bg-white text-[#5865F2] px-10 py-5 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl"
+                className="btn btn-discord px-[26px] py-4 text-[17px]"
               >
-                {t('home.discord.cta')}
-                <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                <DiscordIcon size={24} />
+                {t('home.joinDiscord')}
               </a>
             </div>
-            <div className="hidden md:flex justify-center items-center">
-              <div className="w-64 h-64 bg-white/10 rounded-full flex items-center justify-center animate-pulse-slow">
-                <MessageCircle size={120} className="text-white" />
-              </div>
-            </div>
-          </div>
+          </form>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-start">
-          <div className="space-y-12">
-            <h2 className="text-5xl md:text-7xl font-bold border-l-8 border-primary pl-8">
-              {t('home.who.title')}
-            </h2>
-            <div className="space-y-8 text-2xl opacity-90 leading-relaxed">
-              <p className="font-medium text-foreground">{t('home.who.p1')}</p>
-              <p>{t('home.who.p2')}</p>
-              <div className="pt-4 flex justify-center md:justify-start">
-                <Link
-                  to="/about"
-                  className="group inline-flex items-center gap-3 bg-foreground/5 backdrop-blur-sm border border-border px-8 py-4 rounded-full font-bold text-xl hover:bg-foreground/10 transition-all"
-                >
-                  {t('home.transparency.more')}{' '}
-                  <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
-                </Link>
-              </div>
+        <div data-reveal className="mt-[72px]">
+          <p className="m-0 mb-5 text-[13px] font-bold uppercase tracking-[0.14em] text-ink-faint">
+            {t('home.trustedBy')}
+          </p>
+          <SponsorMarquee />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionHeading({ number, title }: { number: string; title: string }) {
+  return (
+    <div data-reveal className="mb-11 flex items-baseline gap-4">
+      <img src={brandMarkRed} alt="" className="block h-5 w-auto self-center" />
+      <span className="text-[13px] font-bold tracking-[0.16em] text-primary">{number}</span>
+      <h2 className="m-0 font-display text-[30px] font-bold md:text-[40px]">{title}</h2>
+    </div>
+  );
+}
+
+function Community() {
+  const { t } = useLanguage();
+
+  return (
+    <section id="comunidade" className="section-anchor border-t border-line bg-surface-alt">
+      <div className="mx-auto max-w-shell px-7 py-[88px]">
+        <SectionHeading number="01" title={t('nav.community')} />
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] items-center gap-12 border border-line bg-surface px-10 py-11">
+          <div data-reveal className="flex flex-col gap-5">
+            <h3 className="m-0 font-display text-[28px] font-bold">{t('community.title')}</h3>
+            <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('community.body')}</p>
+            <div className="flex flex-wrap gap-3.5">
+              <a
+                href={configUrl.discordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-discord px-[26px]"
+              >
+                <DiscordIcon size={22} />
+                {t('community.joinServer')}
+              </a>
+              <a href={`mailto:${configUrl.contactEmail}`} className="btn btn-outline px-[26px]">
+                {t('community.talkToTeam')}
+              </a>
             </div>
           </div>
-          <div className="bg-primary/5 rounded-[3rem] p-8 md:p-12 border border-primary/20 space-y-8">
-            <h3 className="text-3xl font-bold">{t('home.transparency.title')}</h3>
-            <p className="text-xl opacity-80 leading-relaxed">
-              {t('home.transparency.p1')}
+
+          <div
+            data-reveal
+            className="relative flex flex-col gap-[18px] overflow-hidden rounded-2xl bg-dark px-8 py-[34px]"
+          >
+            <img
+              src={brandMarkWhite}
+              alt=""
+              className="absolute -bottom-[34px] -right-7 block h-40 w-auto opacity-[0.12]"
+            />
+            <p className="eyebrow relative m-0 text-[#ff5c5c]">{t('community.freeLabel')}</p>
+            <h3 className="relative m-0 font-display text-[26px] font-bold text-white">
+              {t('community.freeTitle')}
+            </h3>
+            <p className="relative m-0 text-base leading-[1.7] text-[#c9c9cf]">
+              {t('community.freeBody')}
             </p>
             <a
-              href="https://hcb.hackclub.com/hack-sp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline"
+              href="#apoie"
+              className="btn btn-primary relative mt-1 self-start px-[26px] hover:border-white hover:bg-white hover:text-ink"
             >
-              {t('home.transparency.linkLabel')} <ArrowRight size={20} />
+              {t('community.becomeSupporter')}
             </a>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="text-center py-20 space-y-12 border-t border-border/50">
-          <h2 className="text-5xl md:text-7xl font-bold max-w-4xl mx-auto leading-tight">
-            {language === 'pt'
-              ? 'Pronto para começar sua jornada?'
-              : 'Ready to start your journey?'}
-          </h2>
-          <div className="flex flex-wrap justify-center gap-6">
-            <Link
-              to="/hackathons"
-              className="group flex items-center gap-2 bg-primary text-white px-10 py-5 rounded-full font-bold text-2xl hover:scale-105 transition-all shadow-2xl shadow-primary/20"
-            >
-              {language === 'pt' ? 'Inscrever-se agora' : 'Register Now'}
-              <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+function About() {
+  const { t, language } = useLanguage();
+  const { cards, loading } = useEvents();
+  const steps = ['01', '02', '03', '04'] as const;
+
+  return (
+    <section id="sobre" className="section-anchor border-t border-line bg-surface-alt">
+      <div className="mx-auto max-w-shell px-7 py-[88px]">
+        <SectionHeading number="02" title={t('about.title')} />
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] items-start gap-14">
+          <div data-reveal className="flex flex-col gap-[22px]">
+            <h3 className="m-0 font-display text-2xl font-bold">{t('about.missionTitle')}</h3>
+            <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('about.mission1')}</p>
+            <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('about.mission2')}</p>
+            <blockquote className="m-0 mt-2 border border-line border-l-4 border-l-primary bg-surface px-6 py-5 font-display text-[17px] italic leading-[1.7] text-ink">
+              {t('about.quote')}
+            </blockquote>
+          </div>
+
+          <div data-reveal className="flex flex-col gap-[22px]">
+            <h3 className="m-0 font-display text-2xl font-bold">{t('about.whatIsTitle')}</h3>
+            <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('about.whatIsBody')}</p>
+            <div className="grid grid-cols-2 gap-0.5 bg-dark-alt">
+              {steps.map((step) => (
+                <div key={step} className="bg-dark p-5">
+                  <p className="m-0 mb-2 text-xs font-bold tracking-[0.14em] text-[#ff5c5c]">
+                    {step}
+                  </p>
+                  <p className="m-0 text-base font-semibold leading-[1.5] text-white">
+                    {t(`about.step.${step}` as never)}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="m-0 text-[15px] leading-[1.7] text-ink-muted">{t('about.ageNote')}</p>
           </div>
         </div>
-      </section>
+
+        <div data-reveal className="mt-20 border-t border-line pt-11">
+          <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+            <h3 className="m-0 font-display text-[28px] font-bold">{t('about.doneTitle')}</h3>
+            <p className="m-0 text-sm text-ink-muted">{t('about.doneSubtitle')}</p>
+          </div>
+
+          {loading ? (
+            <p className="m-0 border-t border-line py-8 text-base text-ink-muted">
+              {t('about.loadingEvents')}
+            </p>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6">
+              {cards.map((event) => (
+                <article key={event.id} className="border border-line bg-surface">
+                  <div className="h-[180px] overflow-hidden bg-[#eaeaea]">
+                    <img
+                      src={event.image}
+                      alt={event.name}
+                      className="block h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3 px-6 pb-[26px] pt-[22px]">
+                    <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-primary">
+                      {t('about.pastEvent')}
+                    </p>
+                    <h4 className="m-0 font-display text-[22px] font-bold">{event.name}</h4>
+                    {event.meta[language] && (
+                      <p className="m-0 text-sm text-ink-muted">{event.meta[language]}</p>
+                    )}
+                    <p className="m-0 text-[15px] leading-[1.65] text-ink-soft">
+                      {event.description[language]}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Transparency() {
+  const { t } = useLanguage();
+
+  return (
+    <section id="transparencia" className="section-anchor border-t border-line">
+      <div className="mx-auto max-w-shell px-7 py-[88px]">
+        <SectionHeading number="03" title={t('nav.transparency')} />
+
+        <p data-reveal className="m-0 mb-12 max-w-[860px] text-xl leading-[1.7] text-ink-soft">
+          {t('transparency.intro')}
+        </p>
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] border-l border-t border-line">
+          <TransparencyCard title={t('transparency.financesTitle')} body={t('transparency.financesBody')}>
+            <a
+              href="https://hcb.hackclub.com/hack-sp/transactions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline"
+            >
+              {t('transparency.financesLink')}
+            </a>
+          </TransparencyCard>
+
+          <TransparencyCard
+            title={t('transparency.sponsorshipTitle')}
+            body={t('transparency.sponsorshipBody')}
+          />
+
+          <TransparencyCard title={t('transparency.openTitle')} body={t('transparency.openBody')}>
+            <a
+              href={configUrl.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline"
+            >
+              {t('transparency.openLink')}
+            </a>
+          </TransparencyCard>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TransparencyCard({
+  title,
+  body,
+  children,
+}: {
+  title: string;
+  body: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div
+      data-reveal
+      className="flex flex-col gap-3.5 border-b border-r border-line px-7 py-8"
+    >
+      <h3 className="m-0 font-display text-[22px] font-bold">{title}</h3>
+      <p className="m-0 text-base leading-[1.7] text-ink-soft">{body}</p>
+      {children}
     </div>
   );
-};
+}
+
+function Support() {
+  const { t } = useLanguage();
+
+  return (
+    <section id="apoie" className="section-anchor border-t border-line">
+      <div className="mx-auto max-w-shell px-7 py-[88px]">
+        <SectionHeading number="04" title={t('support.title')} />
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] items-start gap-12">
+          <div data-reveal className="flex flex-col gap-[22px]">
+            <p className="m-0 font-display text-xl leading-[1.7] text-ink">{t('support.lead')}</p>
+            <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('support.body1')}</p>
+            <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('support.body2')}</p>
+          </div>
+
+          <div data-reveal className="flex flex-col gap-5 bg-dark px-9 py-10 text-white">
+            <h3 className="m-0 font-display text-[26px] font-bold text-white">
+              {t('support.donateTitle')}
+            </h3>
+            <p className="m-0 text-base leading-[1.7] text-[#c9c9c9]">{t('support.donateBody')}</p>
+            <div className="mt-1 flex flex-col gap-3">
+              <a
+                href={configUrl.donationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary px-6 hover:border-white hover:bg-white hover:text-ink"
+              >
+                {t('support.donateCta')}
+              </a>
+              <a
+                href={`mailto:${configUrl.contactEmail}`}
+                className="btn border-white bg-transparent px-6 text-white hover:bg-white hover:text-ink"
+              >
+                {t('support.sponsorCta')}
+              </a>
+            </div>
+            <p className="m-0 mt-1 text-sm text-[#8f8f8f]">{configUrl.contactEmail}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Sponsors() {
+  const { t } = useLanguage();
+
+  return (
+    <section id="sponsors" className="section-anchor border-t border-line bg-surface-alt">
+      <div className="mx-auto max-w-shell px-7 py-[72px]">
+        <div data-reveal className="mb-3 flex items-center gap-3">
+          <img src={brandMarkRed} alt="" className="block h-5 w-auto" />
+          <p className="eyebrow m-0 text-primary">{t('sponsors.eyebrow')}</p>
+        </div>
+        <h2 data-reveal className="m-0 mb-9 font-display text-[32px] font-bold">
+          {t('home.trustedBy')}
+        </h2>
+
+        <div data-reveal className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5">
+          {sponsors.map((sponsor) => (
+            <div
+              key={sponsor.alt}
+              className="flex h-24 items-center justify-center border border-line bg-surface p-4"
+            >
+              <img
+                src={sponsor.src}
+                alt={sponsor.alt}
+                className="max-h-14 max-w-[160px] object-contain"
+              />
+            </div>
+          ))}
+        </div>
+
+        <p data-reveal className="m-0 mt-7 text-[15px] text-ink-muted">
+          {t('sponsors.cta')}{' '}
+          <a href="#apoie" className="border-b border-primary text-primary-ink">
+            {t('sponsors.ctaLink')}
+          </a>
+        </p>
+      </div>
+    </section>
+  );
+}

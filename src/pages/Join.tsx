@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTheme } from '../contexts/ThemeContext';
 import { apiUrl, configUrl } from '../config/config';
-import hDark from '../assets/h_dark.svg';
 import hLight from '../assets/h_light.svg';
 import {
   categories,
@@ -85,7 +83,6 @@ const ghostButtonClasses =
 
 export const Join: React.FC = () => {
   const { t } = useLanguage();
-  const { theme } = useTheme();
 
   const [step, setStep] = useState<Step>('category');
   const [category, setCategory] = useState<RegistrationCategory | null>(null);
@@ -630,7 +627,7 @@ export const Join: React.FC = () => {
     <div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-6xl bg-card rounded-[2rem] overflow-hidden grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:aspect-video">
         <aside className="flex md:flex-col items-center md:items-start justify-between md:justify-center gap-6 p-8 md:p-10 border-b md:border-b-0 md:border-r border-hairline">
-          <img src={theme === 'dark' ? hDark : hLight} alt="Hack SP" className="h-9 md:h-12" />
+          <img src={hLight} alt="Hack SP" className="h-9 md:h-12" />
           <p className="hidden md:block text-sm opacity-45 leading-relaxed">{t('register.subtitle')}</p>
 
           {step !== 'done' && (

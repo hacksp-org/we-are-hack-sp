@@ -1,32 +1,28 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        ink: 'var(--ink)',
+        'ink-soft': 'var(--ink-soft)',
+        'ink-muted': 'var(--ink-muted)',
+        'ink-faint': 'var(--ink-faint)',
+        surface: 'var(--surface)',
+        'surface-alt': 'var(--surface-alt)',
+        line: 'var(--line)',
+        dark: 'var(--dark)',
+        'dark-alt': 'var(--dark-alt)',
         primary: 'var(--primary)',
-        secondary: 'var(--secondary)',
-        border: 'var(--border)',
-        card: 'var(--card)',
-        hairline: 'var(--hairline)',
-        muted: 'var(--muted)',
-        hover: 'var(--hover)',
+        'primary-ink': 'var(--primary-ink)',
       },
-      animation: {
-        'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      fontFamily: {
+        display: ['Poppins', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        sans: ['"Nunito Sans"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
-      keyframes: {
-        'pulse-slow': {
-          '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-          '50%': { opacity: 0.9, transform: 'scale(1.02)' },
-        },
-      }
+      maxWidth: {
+        shell: '1160px',
+      },
     },
   },
   plugins: [],

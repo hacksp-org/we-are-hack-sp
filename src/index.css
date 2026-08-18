@@ -2,145 +2,163 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Single light theme. The institutional redesign dropped the dark toggle, so
+  these are plain values rather than swappable tokens — contrast is fixed and
+  known, which is what this kind of site wants.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  --ink: #26262b;
+  --ink-soft: #3d3d3d;
+  --ink-muted: #5c5c5c;
+  --ink-faint: #8f8f96;
+  --surface: #ffffff;
+  --surface-alt: #fafafa;
+  --line: #e2e2e2;
+  --dark: #1b1b1b;
+  --dark-alt: #26262b;
   --primary: #ff0000;
-  --border: rgba(0, 0, 0, 0.04); /* Opacidade bem baixinha para o grid */
-  --card: #f2f2f2;
-  /* Tons translúcidos prontos: o Tailwind não aplica opacidade sobre var() cru */
-  --hairline: rgba(0, 0, 0, 0.08);
-  --muted: rgba(0, 0, 0, 0.2);
-  --hover: rgba(0, 0, 0, 0.04);
-}
-
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ffffff;
-  --primary: #ff0000;
-  --border: rgba(255, 255, 255, 0.04); /* Opacidade bem baixinha para o grid */
-  --card: #161616;
-  --hairline: rgba(255, 255, 255, 0.08);
-  --muted: rgba(255, 255, 255, 0.2);
-  --hover: rgba(255, 255, 255, 0.04);
+  --primary-ink: #cc0000;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-surface text-ink;
+    font-family: 'Nunito Sans', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  a {
+    color: var(--primary-ink);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
   }
 }
 
-.theme-transition body {
-  @apply transition-colors duration-300;
+@layer components {
+  /* Anchor targets sit under the 73px sticky header. */
+  .section-anchor {
+    scroll-margin-top: 88px;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[10px] px-6 py-3.5 text-base font-bold transition-colors;
+    border: 1.5px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    background: var(--dark-alt);
+    border-color: var(--dark-alt);
+    color: #ffffff;
+  }
+
+  .btn-outline {
+    background: var(--surface);
+    border-color: var(--dark-alt);
+    color: var(--dark-alt);
+  }
+
+  .btn-outline:hover {
+    background: var(--dark-alt);
+    color: #ffffff;
+  }
+
+  .btn-discord {
+    background: #5865f2;
+    border-color: #5865f2;
+    color: #ffffff;
+  }
+
+  .btn-discord:hover {
+    background: #4752c4;
+    border-color: #4752c4;
+    color: #ffffff;
+  }
+
+  .eyebrow {
+    @apply text-[13px] font-bold uppercase;
+    letter-spacing: 0.16em;
+  }
+
+  .link-underline {
+    @apply self-start pb-0.5 text-[15px] font-bold;
+    color: var(--primary-ink);
+    border-bottom: 2px solid var(--primary);
+  }
 }
 
-.glow-container {
-  @apply relative min-h-screen w-full;
-  background-image: 
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 30px 30px; /* Grid menor */
+/* Sponsor strip: the track holds two copies of the list, so translating it
+   halfway leaves the second copy exactly where the first began. */
+@keyframes sponsor-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
-.glow-effect {
-  @apply fixed top-0 left-0 w-full h-full pointer-events-none z-[1];
+.marquee-track {
+  animation: sponsor-marquee linear infinite;
+  will-change: transform;
 }
 
-.page-transition {
-  @apply animate-[fadeIn_0.5s_ease-out];
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
-.typing-cursor {
-  @apply inline-block w-1 h-[0.8em] bg-primary animate-pulse align-middle;
+/* Sections fade up as they enter the viewport; see useReveal. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
 }
 
-@keyframes popIn {
-  0% { opacity: 0; transform: scale(0.5); }
-  70% { opacity: 1; transform: scale(1.08); }
-  100% { transform: scale(1); }
-}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
-.animate-pop-in {
-  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
+  .marquee-track {
+    animation: none;
+  }
 
-@keyframes slideInFromTop {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideInFromLeft {
-  from { transform: translateX(-10px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideInFromBottom {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.animate-in {
-  animation-duration: 0.5s;
-  animation-fill-mode: both;
-  animation-timing-function: ease-out;
-}
-
-.fade-in {
-  animation-name: fadeIn;
-}
-
-.slide-in-from-top-2 {
-  animation-name: slideInFromTop;
-}
-
-.slide-in-from-left-4 {
-  animation-name: slideInFromLeft;
-}
-
-.slide-in-from-bottom-4 {
-  animation-name: slideInFromBottom;
-}
-
-.slide-in-from-bottom-8 {
-  animation-name: slideInFromBottom;
-  animation-duration: 0.8s;
-}
-
-.slide-in-from-bottom-12 {
-  animation-name: slideInFromBottom;
-  animation-duration: 1s;
-}
-
-.fill-mode-both {
-  animation-fill-mode: both;
-}
-
-.duration-300 {
-  animation-duration: 300ms;
-}
-
-.duration-500 {
-  animation-duration: 500ms;
-}
-
-.duration-1000 {
-  animation-duration: 1000ms;
-}
-
-.delay-200 {
-  animation-delay: 200ms;
-}
-
-.delay-500 {
-  animation-delay: 500ms;
-}
-
-.delay-700 {
-  animation-delay: 700ms;
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

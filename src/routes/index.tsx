@@ -1,57 +1,27 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '../layouts/Layout';
 import { Home } from '../pages/Home';
-import { About } from '../pages/About';
-import { Hackathons } from '../pages/Hackathons';
-import { Transparency } from '../pages/Transparency';
-import { Support } from '../pages/Support';
-import { FAQ } from '../pages/FAQ';
+import { Conduct } from '../pages/Conduct';
+import { Terms } from '../pages/Terms';
 import { EventPage } from '../pages/events/EventPage';
 import { Join } from '../pages/Join';
-import { Unsubscribe } from '../pages/Unsubscribe';
 
+/**
+ * The redesign folded About, Hackathons, Transparency, Support and FAQ into the
+ * home page as anchored sections, so those routes are gone — the footer and
+ * header now link to `#sobre`, `#transparencia` and so on.
+ */
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: 'about',
-        element: <About />,
-      },
-      {
-        path: 'hackathons',
-        element: <Hackathons />,
-      },
-      {
-        path: 'transparency',
-        element: <Transparency />,
-      },
-      {
-        path: 'support',
-        element: <Support />,
-      },
-      {
-        path: 'faq',
-        element: <FAQ />,
-      },
-      {
-        path: 'unsubscribe',
-        element: <Unsubscribe />,
-      },
-      {
-        path: ':eventId',
-        element: <EventPage />,
-      },
+      { index: true, element: <Home /> },
+      { path: 'conduct', element: <Conduct /> },
+      { path: 'terms', element: <Terms /> },
+      { path: ':eventId', element: <EventPage /> },
     ],
   },
-  // Standalone page: no header or footer, so registration stands apart from the site.
-  {
-    path: '/join',
-    element: <Join />,
-  },
+  // Standalone: registration stands apart from the site, with no header or footer.
+  { path: '/join', element: <Join /> },
 ]);
