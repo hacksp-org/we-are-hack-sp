@@ -1,5 +1,22 @@
 export const translations = {
   pt: {
+    "join.heroTitle": "Inscreva-se nos hackathons do Hack SP",
+    "join.heroLead": "Escolha seu perfil e preencha seus dados. Leva menos de dois minutos, e é de graça.",
+    "join.step1": "Etapa 1 de 2",
+    "join.step2": "Etapa 2 de 2",
+    "join.lastStep": "Último passo",
+    "join.formNote": "Enviamos um e-mail de confirmação com os próximos passos. Gratuito, e você pode sair da lista quando quiser.",
+    "join.talkTitle": "Prefere conversar antes?",
+    "join.talkBody": "Entra no nosso servidor do Discord. Você pode perguntar o que quiser antes de se inscrever — não precisa saber programar.",
+    "join.knowTitle": "Bom saber",
+    "join.know1": "Os eventos são para estudantes do Ensino Médio (aprox. 14 a 18 anos), sempre gratuitos e com supervisão de adultos.",
+    "join.know2": "Menor de 18? Um responsável assina a autorização — enviamos por e-mail.",
+    "join.readConduct": "Ler o código de conduta →",
+    "join.codeLead": "Enviamos um código de 6 dígitos para o seu e-mail. Digite ele abaixo para concluir sua inscrição.",
+    "join.codeHelp": "Não recebeu? Olhe o spam ou escreva para contact@hacksp.org.",
+    "join.doneTitle": "Inscrição concluída!",
+    "join.doneBody": "Recebemos seus dados. Confira sua caixa de entrada para o e-mail de confirmação — e passa no Discord pra dar um oi enquanto espera.",
+
     "nav.community": "Comunidade",
     "nav.sponsors": "Patrocinadores",
 
@@ -291,6 +308,23 @@ export const translations = {
     "unsubscribe.test.message": "Era um link de teste, então a API não foi chamada. É exatamente esta a tela que a pessoa veria em um envio real."
   },
   en: {
+    "join.heroTitle": "Sign up for the Hack SP hackathons",
+    "join.heroLead": "Pick your profile and fill in your details. It takes under two minutes, and it's free.",
+    "join.step1": "Step 1 of 2",
+    "join.step2": "Step 2 of 2",
+    "join.lastStep": "Last step",
+    "join.formNote": "We'll send a confirmation e-mail with the next steps. Free, and you can leave the list whenever you want.",
+    "join.talkTitle": "Prefer to talk first?",
+    "join.talkBody": "Come to our Discord server. You can ask anything before signing up — no experience required.",
+    "join.knowTitle": "Good to know",
+    "join.know1": "Events are for high school students (roughly 14–18), always free, with adult supervision.",
+    "join.know2": "Under 18? A guardian signs the authorization — we send it by e-mail.",
+    "join.readConduct": "Read the code of conduct →",
+    "join.codeLead": "We sent a 6-digit code to your e-mail. Type it below to finish your registration.",
+    "join.codeHelp": "Didn't get it? Check your spam folder or write to contact@hacksp.org.",
+    "join.doneTitle": "Registration complete!",
+    "join.doneBody": "We got your details. Check your inbox for the confirmation e-mail — and come say hi on Discord while you wait.",
+
     "nav.community": "Community",
     "nav.sponsors": "Sponsors",
 

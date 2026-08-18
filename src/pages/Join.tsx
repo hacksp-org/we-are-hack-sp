@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { apiUrl, configUrl } from '../config/config';
-import hLight from '../assets/h_light.svg';
+import { DiscordIcon } from '../components/icons';
 import {
   categories,
   categoryFields,
@@ -12,22 +12,13 @@ import {
   type FieldConfig,
   type RegistrationCategory,
 } from '../constants/registration';
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronDown,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  MailCheck,
-  Plus,
-  Send,
-} from 'lucide-react';
+import brandMarkWhite from '../assets/brand/brand-mark-white.png';
+import heroPhoto from '../assets/events/hero.jpeg';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
-// Reformatted from the raw digits on every keystroke, so paste and delete
-// both land on a valid mask instead of drifting out of sync with it.
+// Reformatted from the raw digits on every keystroke, so paste and delete both
+// land on a valid mask instead of drifting out of sync with it.
 const maskCpf = (value: string) =>
   onlyDigits(value)
     .slice(0, 11)
@@ -48,10 +39,10 @@ const FIELD_MASKS: Partial<Record<string, (value: string) => string>> = {
   cnpj: maskCnpj,
 };
 
-type Step = 'category' | 'personal' | 'details' | 'verify' | 'dependents' | 'done';
+type Step = 'form' | 'code' | 'dependents' | 'done';
 
-// Kept so a reload during the email verification step doesn't strand the
-// registration, which already exists on the server at that point.
+// Kept so a reload during verification doesn't strand a registration that
+// already exists on the server.
 const STORAGE_KEY = 'hacksp:registration';
 
 interface PendingRegistration {
@@ -70,56 +61,65 @@ const readPending = (): PendingRegistration | null => {
   }
 };
 
-const inputClasses =
-  'w-full bg-background rounded-xl px-4 py-3.5 text-foreground border border-transparent placeholder:opacity-30 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all';
-const selectClasses = `${inputClasses} appearance-none cursor-pointer`;
-const labelClasses = 'block text-xs font-medium uppercase tracking-wider mb-2 opacity-45';
-// The panel around each step is the card, so a step is just stacked content.
-const cardClasses = 'space-y-6';
-const primaryButtonClasses =
-  'flex items-center justify-center gap-2 bg-primary text-white px-8 py-3.5 rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50';
-const ghostButtonClasses =
-  'flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-semibold opacity-55 hover:opacity-100 transition-opacity';
-
-export const Join: React.FC = () => {
+export function Join() {
   const { t } = useLanguage();
 
-  const [step, setStep] = useState<Step>('category');
-  const [category, setCategory] = useState<RegistrationCategory | null>(null);
+  const [step, setStep] = useState<Step>('form');
+  const [category, setCategory] = useState<RegistrationCategory>('student');
   const [values, setValues] = useState<Record<string, string>>({});
   const [pending, setPending] = useState<PendingRegistration | null>(null);
 
-  const [status, setStatus] = useState<'idle' | 'loading'>('idle');
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const [code, setCode] = useState('');
   const [resending, setResending] = useState(false);
-
   const [dependent, setDependent] = useState<Record<string, string>>({});
   const [dependents, setDependents] = useState<string[]>([]);
+
+  const detailFields = categoryFields[category];
 
   useEffect(() => {
     const stored = readPending();
     if (stored) {
       setPending(stored);
       setCategory(stored.category);
-      setStep('verify');
+      setStep('code');
+      return;
     }
+    // The home hero hands the address over so nobody types it twice.
+    const fromHero = new URLSearchParams(window.location.search).get('email');
+    if (fromHero) setValues((prev) => ({ ...prev, email: fromHero }));
   }, []);
 
-  const detailFields = category ? categoryFields[category] : [];
-  const totalSteps = category === 'guardian' ? 5 : 4;
-  const stepNumber: Record<Step, number> = { category: 1, personal: 2, details: 3, verify: 4, dependents: 5, done: 5 };
+  const setValue = (name: string, value: string) =>
+    setValues((prev) => ({ ...prev, [name]: value }));
 
-  const setValue = (name: string, value: string) => setValues((prev) => ({ ...prev, [name]: value }));
-  const setDependentField = (name: string, value: string) =>
-    setDependent((prev) => ({ ...prev, [name]: value }));
+  const goTo = (next: Step) => {
+    setStep(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  // `values[field.name]` holds an option code (e.g. "mother"), not text — the
-  // API gets whatever that code translates to in the language the person is
-  // using, or their own words when they picked "other".
-  const resolveFieldValue = (field: FieldConfig, source: Record<string, string>): string => {
+  const startVerification = (registration: PendingRegistration) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(registration));
+    setPending(registration);
+    setNotice(null);
+    goTo('code');
+  };
+
+  const finishVerification = (verified: RegistrationCategory) => {
+    if (verified === 'guardian') {
+      goTo('dependents');
+      return;
+    }
+    localStorage.removeItem(STORAGE_KEY);
+    goTo('done');
+  };
+
+  // A select stores an option code; the API is sent the label in the language
+  // the person is using, or their own words when they picked "other".
+  const resolveValue = (field: FieldConfig, source: Record<string, string>): string => {
     if (field.type !== 'select') return source[field.name]?.trim() ?? '';
     const selected = source[field.name];
     if (selected === OTHER_OPTION_VALUE) return source[`${field.name}_other`]?.trim() ?? '';
@@ -127,65 +127,42 @@ export const Join: React.FC = () => {
     return option ? t(option.labelKey) : '';
   };
 
-  const errorKeyForStatus = (httpStatus: number) => {
-    if (httpStatus === 409) return 'register.error.duplicate';
-    if (httpStatus === 422) return 'register.error.invalid';
-    if (httpStatus === 429) return 'register.error.rateLimit';
-    // Only reached when a 502 arrives without the id/sig body — an older API
-    // build. With them, handleSubmit routes the registrant to resend instead.
-    if (httpStatus === 502) return 'register.error.emailFailed';
+  const errorKeyForStatus = (status: number) => {
+    if (status === 409) return 'register.error.duplicate';
+    if (status === 422) return 'register.error.invalid';
+    if (status === 429) return 'register.error.rateLimit';
+    if (status === 502) return 'register.error.emailFailed';
     return 'register.error.generic';
   };
 
-  const startVerification = (registration: PendingRegistration) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(registration));
-    setPending(registration);
-    setError(null);
-    setNotice(null);
-    setStep('verify');
-  };
-
-  // Reached once the email is confirmed, whether just now or on an earlier try.
-  const finishVerification = (verifiedCategory: RegistrationCategory) => {
-    if (verifiedCategory === 'guardian') {
-      setStep('dependents');
-      return;
-    }
-    localStorage.removeItem(STORAGE_KEY);
-    setStep('done');
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!category) return;
-
-    setStatus('loading');
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
     setError(null);
 
     const payload: Record<string, string> = { category };
     [...commonFields, ...detailFields].forEach((field) => {
-      const value = resolveFieldValue(field, values);
+      const value = resolveValue(field, values);
       if (value || !field.optional) payload[field.name] = value;
     });
 
     try {
-      const res = await fetch(apiUrl.registrations, {
+      const response = await fetch(apiUrl.registrations, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        const body = await res.json();
+      if (response.ok) {
+        const body = await response.json();
         startVerification({ id: body.id, sig: body.sig, email: payload.email, category });
         return;
       }
 
-      // 502 means the registration was saved but the email never left. The
-      // body carries id and sig, so the registrant continues through resend
-      // instead of signing up again.
-      if (res.status === 502) {
-        const body = await res.json().catch(() => null);
+      // 502 means the row was saved but the email never left; the body carries
+      // id and sig so the person continues through resend instead of restarting.
+      if (response.status === 502) {
+        const body = await response.json().catch(() => null);
         if (body?.id && body?.sig) {
           startVerification({ id: body.id, sig: body.sig, email: payload.email, category });
           setError(t('register.error.emailFailedRetry'));
@@ -193,42 +170,42 @@ export const Join: React.FC = () => {
         }
       }
 
-      setError(t(errorKeyForStatus(res.status), { email: configUrl.contactEmail }));
+      setError(t(errorKeyForStatus(response.status), { email: configUrl.contactEmail }));
     } catch {
       setError(t('register.error.generic'));
     } finally {
-      setStatus('idle');
+      setBusy(false);
     }
   };
 
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVerify = async (event: FormEvent) => {
+    event.preventDefault();
     if (!pending) return;
 
-    setStatus('loading');
+    setBusy(true);
     setError(null);
     setNotice(null);
 
     try {
-      const res = await fetch(apiUrl.verifyEmail(pending.id), {
+      const response = await fetch(apiUrl.verifyEmail(pending.id), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
       });
 
-      if (res.ok) {
+      if (response.ok) {
         finishVerification(pending.category);
         return;
       }
 
-      if (res.status === 400) setError(t('register.verify.invalid'));
-      else if (res.status === 404) setError(t('register.verify.missing'));
-      else if (res.status === 429) setError(t('register.verify.tooMany'));
+      if (response.status === 400) setError(t('register.verify.invalid'));
+      else if (response.status === 404) setError(t('register.verify.missing'));
+      else if (response.status === 429) setError(t('register.verify.tooMany'));
       else setError(t('register.error.generic'));
     } catch {
       setError(t('register.error.generic'));
     } finally {
-      setStatus('idle');
+      setBusy(false);
     }
   };
 
@@ -240,15 +217,13 @@ export const Join: React.FC = () => {
     setNotice(null);
 
     try {
-      const res = await fetch(apiUrl.resendCode(pending.id), { method: 'POST' });
+      const response = await fetch(apiUrl.resendCode(pending.id), { method: 'POST' });
 
-      if (res.ok) setNotice(t('register.verify.resent'));
-      // Already verified: there is nothing left to confirm, so move on.
-      else if (res.status === 409) finishVerification(pending.category);
-      else if (res.status === 429) setError(t('register.verify.tooMany'));
-      else if (res.status === 404) setError(t('register.verify.missing'));
-      else if (res.status === 502) setError(t('register.error.emailFailed', { email: configUrl.contactEmail }));
-      else setError(t('register.error.generic'));
+      if (response.ok) setNotice(t('register.verify.resent'));
+      else if (response.status === 409) finishVerification(pending.category);
+      else if (response.status === 429) setError(t('register.verify.tooMany'));
+      else if (response.status === 404) setError(t('register.verify.missing'));
+      else setError(t('register.error.emailFailed', { email: configUrl.contactEmail }));
     } catch {
       setError(t('register.error.generic'));
     } finally {
@@ -256,409 +231,435 @@ export const Join: React.FC = () => {
     }
   };
 
-  const handleAddDependent = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddDependent = async (event: FormEvent) => {
+    event.preventDefault();
     if (!pending) return;
 
-    setStatus('loading');
+    setBusy(true);
     setError(null);
-    setNotice(null);
 
     try {
-      const res = await fetch(apiUrl.dependents(pending.id), {
+      const response = await fetch(apiUrl.dependents(pending.id), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sig: pending.sig,
-          ...Object.fromEntries(dependentFields.map((field) => [field.name, resolveFieldValue(field, dependent)])),
+          ...Object.fromEntries(
+            dependentFields.map((field) => [field.name, resolveValue(field, dependent)]),
+          ),
         }),
       });
 
-      if (res.ok) {
+      if (response.ok) {
         setDependents((prev) => [...prev, dependent.full_name?.trim() ?? '']);
         setDependent({});
         return;
       }
 
-      if (res.status === 400) setError(t('register.dependents.badSig'));
-      else if (res.status === 403) setError(t('register.dependents.unverified'));
-      else if (res.status === 404) setError(t('register.verify.missing'));
-      else if (res.status === 429) setError(t('register.error.rateLimit'));
+      if (response.status === 400) setError(t('register.dependents.badSig'));
+      else if (response.status === 403) setError(t('register.dependents.unverified'));
+      else if (response.status === 404) setError(t('register.verify.missing'));
       else setError(t('register.dependents.error'));
     } catch {
       setError(t('register.dependents.error'));
     } finally {
-      setStatus('idle');
+      setBusy(false);
     }
   };
 
   const restart = () => {
     localStorage.removeItem(STORAGE_KEY);
     setPending(null);
-    setCategory(null);
     setValues({});
     setCode('');
     setError(null);
     setNotice(null);
-    setStep('category');
+    goTo('form');
   };
 
-  const finish = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setStep('done');
-  };
+  return (
+    <div className="min-h-screen bg-surface">
+      <div className="h-1 bg-primary" />
 
-  const renderField = (
-    field: FieldConfig,
-    values: Record<string, string>,
-    setField: (name: string, value: string) => void,
-    idPrefix = '',
-  ) => {
-    const id = `${idPrefix}${field.name}`;
-    const value = values[field.name] ?? '';
-    const label = (
-      <label htmlFor={id} className={labelClasses}>
-        {t(field.labelKey)}
-        {field.optional && <span className="opacity-50 font-normal"> ({t('register.optional')})</span>}
-      </label>
-    );
-
-    if (field.type === 'select') {
-      const isOther = value === OTHER_OPTION_VALUE;
-      return (
-        <div key={id} className="space-y-3">
-          <div>
-            {label}
-            <div className="relative">
-              <select
-                id={id}
-                required={!field.optional}
-                value={value}
-                onChange={(e) => setField(field.name, e.target.value)}
-                className={selectClasses}
-              >
-                <option value="" disabled>
-                  {field.placeholderKey ? t(field.placeholderKey) : ''}
-                </option>
-                {field.options?.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {t(option.labelKey)}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={18}
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-40"
-              />
-            </div>
-          </div>
-
-          {isOther && (
-            <input
-              id={`${id}-other`}
-              type="text"
-              required
-              autoFocus
-              value={values[`${field.name}_other`] ?? ''}
-              onChange={(e) => setField(`${field.name}_other`, e.target.value)}
-              placeholder={t('register.field.other.placeholder')}
-              className={`${inputClasses} animate-in fade-in slide-in-from-top-1 duration-300`}
-            />
-          )}
-        </div>
-      );
-    }
-
-    const mask = FIELD_MASKS[field.name];
-    return (
-      <div key={id}>
-        {label}
-        <input
-          id={id}
-          type={field.type}
-          inputMode={mask ? 'numeric' : undefined}
-          required={!field.optional}
-          value={value}
-          onChange={(e) => setField(field.name, mask ? mask(e.target.value) : e.target.value)}
-          placeholder={field.placeholderKey ? t(field.placeholderKey) : undefined}
-          className={inputClasses}
+      <section className="relative overflow-hidden bg-dark-alt">
+        <img
+          src={heroPhoto}
+          alt=""
+          className="absolute inset-0 block h-full w-full object-cover opacity-25"
         />
-      </div>
-    );
-  };
-
-  const feedback = useMemo(() => {
-    if (!error && !notice) return null;
-
-    return (
-      <div className="flex items-center gap-3 text-primary bg-background rounded-xl px-4 py-3 animate-in fade-in slide-in-from-top-1 duration-300">
-        {error ? (
-          <AlertCircle size={20} className="flex-shrink-0" />
-        ) : (
-          <MailCheck size={20} className="flex-shrink-0" />
-        )}
-        <p className="text-sm font-medium">{error ?? notice}</p>
-      </div>
-    );
-  }, [error, notice]);
-
-  const renderStep = () => {
-    if (step === 'done') {
-      return (
-        <div className="space-y-6">
-          <CheckCircle2 className="text-primary animate-pop-in" size={40} />
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold">{t('register.success.title')}</h2>
-            <p className="text-sm opacity-50">{t('register.success.message')}</p>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,30,34,0.72)_0%,rgba(30,30,34,0.9)_100%)]" />
+        <div className="relative z-[2] mx-auto max-w-shell px-7 pb-16 pt-[72px]">
+          <div className="mb-5 flex items-center gap-3.5">
+            <img src={brandMarkWhite} alt="" className="block h-[22px] w-auto" />
+            <p className="eyebrow m-0 text-white">{t('register.title')}</p>
           </div>
-          <Link to="/" className={`${ghostButtonClasses} inline-flex -ml-6`}>
-            <ArrowLeft size={18} />
-            {t('register.success.home')}
-          </Link>
+          <h1 className="m-0 mb-4 font-display text-[32px] font-extrabold leading-[1.15] tracking-[-0.02em] text-white md:text-[46px]">
+            {t('join.heroTitle')}
+          </h1>
+          <p className="m-0 max-w-[680px] text-[19px] leading-[1.65] text-[#dcdcdc]">
+            {t('join.heroLead')}
+          </p>
         </div>
-      );
-    }
+      </section>
 
-    if (step === 'category') {
-      return (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">{t('register.category.title')}</h2>
+      {step === 'form' && (
+        <>
+          <section className="mx-auto max-w-shell px-7 pb-10 pt-[72px]">
+            <StepLabel>{t('join.step1')}</StepLabel>
+            <h2 className="m-0 mb-8 font-display text-[32px] font-bold">
+              {t('register.category.title')}
+            </h2>
 
-          <div className="-mx-3 divide-y divide-hairline">
-            {categories.map(({ id, icon: Icon, labelKey, descKey }, index) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => {
-                  setCategory(id);
-                  setStep('personal');
-                }}
-                style={{ animationDelay: `${index * 60}ms` }}
-                className="group w-full flex items-center gap-4 text-left px-3 py-4 hover:bg-hover transition-colors animate-in fade-in slide-in-from-left-4 fill-mode-both duration-500"
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-4">
+              {categories.map(({ id, labelKey, descKey }) => {
+                const active = id === category;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setCategory(id)}
+                    aria-pressed={active}
+                    className={`rounded-[14px] bg-surface px-[22px] py-6 text-left transition-all ${
+                      active
+                        ? 'border-2 border-primary shadow-[0_6px_18px_rgba(255,0,0,0.12)]'
+                        : 'border-2 border-line hover:border-ink-faint'
+                    }`}
+                  >
+                    <span className="block font-display text-lg font-bold">{t(labelKey)}</span>
+                    <span className="mt-1.5 block text-[15px] leading-[1.6] text-ink-muted">
+                      {t(descKey)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="mx-auto max-w-shell px-7 pb-[88px] pt-4">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-start gap-10">
+              <form
+                onSubmit={handleSubmit}
+                className="rounded-2xl border border-line bg-surface-alt px-[34px] py-9"
               >
-                <Icon size={20} className="text-primary flex-shrink-0 transition-transform group-hover:scale-110" />
-                <span className="flex-1 min-w-0">
-                  <span className="block font-medium">{t(labelKey)}</span>
-                  <span className="block text-sm opacity-45">{t(descKey)}</span>
-                </span>
-                <ArrowRight
-                  size={18}
-                  className="flex-shrink-0 opacity-0 -translate-x-1 group-hover:opacity-40 group-hover:translate-x-0 transition-all"
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-      );
-    }
+                <StepLabel>{t('join.step2')}</StepLabel>
+                <h2 className="m-0 mb-7 font-display text-[28px] font-bold">
+                  {t('register.personal.title')}
+                </h2>
 
-    if (step === 'personal' || step === 'details') {
-      const isPersonal = step === 'personal';
-      const fields = isPersonal ? commonFields : detailFields;
+                <div className="flex flex-col gap-5">
+                  {commonFields.map((field) => (
+                    <JoinField
+                      key={field.name}
+                      field={field}
+                      value={values[field.name] ?? ''}
+                      other={values[`${field.name}_other`] ?? ''}
+                      onChange={setValue}
+                      t={t}
+                    />
+                  ))}
 
-      return (
-        <form
-          onSubmit={(e) => {
-            if (isPersonal) {
-              e.preventDefault();
-              setStep('details');
-              return;
-            }
-            handleSubmit(e);
-          }}
-          className={cardClasses}
-        >
-          <h2 className="text-xl font-semibold">
-            {t(isPersonal ? 'register.personal.title' : 'register.details.title')}
-          </h2>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {detailFields.map((field) => (
+                      <JoinField
+                        key={field.name}
+                        field={field}
+                        value={values[field.name] ?? ''}
+                        other={values[`${field.name}_other`] ?? ''}
+                        onChange={setValue}
+                        t={t}
+                      />
+                    ))}
+                  </div>
 
-          <div className="space-y-6">
-            {fields.map((field) => renderField(field, values, setValue))}
-          </div>
+                  {error && <Feedback tone="error">{error}</Feedback>}
 
-          {feedback}
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="mt-2 w-full rounded-[10px] border-[1.5px] border-primary bg-primary px-6 py-[18px] font-display text-lg font-bold text-white transition-colors hover:border-ink hover:bg-ink disabled:opacity-50"
+                  >
+                    {busy ? t('register.submitting') : t('register.submit')}
+                  </button>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button
-              type="button"
-              onClick={() => {
-                setError(null);
-                setStep(isPersonal ? 'category' : 'personal');
-              }}
-              className={ghostButtonClasses}
-            >
-              <ArrowLeft size={18} />
-              {t('register.back')}
-            </button>
+                  <p className="m-0 text-sm leading-[1.6] text-ink-muted">{t('join.formNote')}</p>
+                </div>
+              </form>
 
-            <button type="submit" disabled={status === 'loading'} className={`${primaryButtonClasses} flex-1`}>
-              {status === 'loading' ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  {t('register.submitting')}
-                </>
-              ) : (
-                <>
-                  {isPersonal ? t('register.next') : t('register.submit')}
-                  {isPersonal ? <ArrowRight size={20} /> : <Send size={20} />}
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      );
-    }
+              <div className="flex flex-col gap-5">
+                <div className="relative overflow-hidden rounded-2xl bg-dark-alt px-[30px] py-8 text-white">
+                  <h3 className="relative m-0 mb-3.5 font-display text-[22px] font-bold text-white">
+                    {t('join.talkTitle')}
+                  </h3>
+                  <p className="relative m-0 mb-[22px] text-base leading-[1.7] text-[#c9c9c9]">
+                    {t('join.talkBody')}
+                  </p>
+                  <a
+                    href={configUrl.discordUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-discord relative px-[26px]"
+                  >
+                    <DiscordIcon size={22} />
+                    {t('community.joinServer')}
+                  </a>
+                </div>
 
-    if (step === 'verify') {
-      return (
-        <form onSubmit={handleVerify} className={cardClasses}>
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold">{t('register.verify.title')}</h2>
-            <p className="text-sm opacity-50">{t('register.verify.message', { email: pending?.email ?? '' })}</p>
-          </div>
+                <div className="flex flex-col gap-3.5 rounded-2xl border border-line px-[26px] py-7">
+                  <h3 className="m-0 font-display text-xl font-bold">{t('join.knowTitle')}</h3>
+                  <p className="m-0 text-[15px] leading-[1.7] text-ink-soft">{t('join.know1')}</p>
+                  <p className="m-0 text-[15px] leading-[1.7] text-ink-soft">{t('join.know2')}</p>
+                  <Link to="/conduct" className="link-underline">
+                    {t('join.readConduct')}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
-          <div>
-            <label htmlFor="code" className={labelClasses}>
-              {t('register.verify.label')}
+      {step === 'code' && (
+        <section className="mx-auto max-w-shell px-7 pb-[88px] pt-[72px]">
+          <form
+            onSubmit={handleVerify}
+            className="flex max-w-[620px] flex-col gap-5 rounded-2xl border border-line bg-surface-alt px-9 py-10"
+          >
+            <StepLabel>{t('join.lastStep')}</StepLabel>
+            <h2 className="m-0 font-display text-[30px] font-bold">{t('register.verify.title')}</h2>
+            <p className="m-0 text-[17px] leading-[1.7] text-ink-soft">{t('join.codeLead')}</p>
+
+            <label className="mt-1 flex flex-col gap-2">
+              <span className="text-sm font-semibold text-ink-soft">
+                {t('register.verify.label')}
+              </span>
+              <input
+                inputMode="numeric"
+                required
+                value={code}
+                onChange={(event) => setCode(onlyDigits(event.target.value).slice(0, 6))}
+                placeholder="000000"
+                className="rounded-[10px] border-[1.5px] border-[#d5d5d5] bg-surface px-[18px] py-4 text-center font-display text-[26px] font-bold tracking-[0.34em] focus:border-primary focus:outline-none"
+              />
             </label>
-            <input
-              id="code"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              placeholder="000000"
-              className={`${inputClasses} text-center text-2xl tracking-[0.5em] font-bold`}
-            />
-          </div>
 
-          {feedback}
+            {error && <Feedback tone="error">{error}</Feedback>}
+            {notice && !error && <Feedback tone="success">{notice}</Feedback>}
 
-          <div className="space-y-4">
-            <button type="submit" disabled={status === 'loading'} className={`${primaryButtonClasses} w-full`}>
-              {status === 'loading' ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  {t('register.verify.confirming')}
-                </>
-              ) : (
-                t('register.verify.confirm')
-              )}
+            <button
+              type="submit"
+              disabled={busy || code.length !== 6}
+              className="w-full rounded-[10px] border-[1.5px] border-primary bg-primary px-6 py-[18px] font-display text-lg font-bold text-white transition-colors hover:border-ink hover:bg-ink disabled:opacity-50"
+            >
+              {busy ? t('register.verify.confirming') : t('register.verify.confirm')}
             </button>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm font-semibold">
+            <div className="flex flex-wrap items-center gap-5">
               <button
                 type="button"
                 onClick={handleResend}
                 disabled={resending}
-                className="opacity-70 hover:opacity-100 transition-opacity disabled:opacity-40"
+                className="border-none bg-transparent p-0 text-[15px] font-bold text-primary-ink disabled:opacity-50"
               >
                 {resending ? t('register.verify.resending') : t('register.verify.resend')}
               </button>
               <button
                 type="button"
                 onClick={restart}
-                className="opacity-70 hover:opacity-100 transition-opacity"
+                className="border-none bg-transparent p-0 text-[15px] font-bold text-ink-muted hover:text-ink"
               >
                 {t('register.verify.restart')}
               </button>
             </div>
-          </div>
-        </form>
-      );
-    }
 
-    return (
-      <div className={cardClasses}>
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">{t('register.dependents.title')}</h2>
-          <p className="text-sm opacity-50">{t('register.dependents.message')}</p>
-        </div>
+            <p className="m-0 text-sm leading-[1.6] text-ink-muted">{t('join.codeHelp')}</p>
+          </form>
+        </section>
+      )}
 
-        {dependents.length > 0 && (
-          <div className="space-y-2">
-            <p className={labelClasses}>{t('register.dependents.list')}</p>
-            <ul className="space-y-2">
-              {dependents.map((name, index) => (
-                <li
-                  key={`${name}-${index}`}
-                  className="flex items-center gap-3 bg-background rounded-xl px-4 py-3"
-                >
-                  <CheckCircle2 size={18} className="text-primary flex-shrink-0" />
-                  <span className="font-medium">{name}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+      {step === 'dependents' && (
+        <section className="mx-auto max-w-shell px-7 pb-[88px] pt-[72px]">
+          <div className="flex max-w-[620px] flex-col gap-5 rounded-2xl border border-line bg-surface-alt px-9 py-10">
+            <StepLabel>{t('join.lastStep')}</StepLabel>
+            <h2 className="m-0 font-display text-[30px] font-bold">
+              {t('register.dependents.title')}
+            </h2>
+            <p className="m-0 text-[17px] leading-[1.7] text-ink-soft">
+              {t('register.dependents.message')}
+            </p>
 
-        <form onSubmit={handleAddDependent} className="space-y-6">
-          {dependentFields.map((field) => renderField(field, dependent, setDependentField, 'dependent-'))}
-
-          {feedback}
-
-          <button type="submit" disabled={status === 'loading'} className={`${primaryButtonClasses} w-full`}>
-            {status === 'loading' ? (
-              <>
-                <Loader2 size={20} className="animate-spin" />
-                {t('register.dependents.adding')}
-              </>
-            ) : (
-              <>
-                <Plus size={20} />
-                {t('register.dependents.add')}
-              </>
+            {dependents.length > 0 && (
+              <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                {dependents.map((name, index) => (
+                  <li
+                    key={`${name}-${index}`}
+                    className="rounded-[10px] border border-line bg-surface px-4 py-3 font-semibold"
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
             )}
-          </button>
-        </form>
 
-        <button type="button" onClick={finish} className={`${ghostButtonClasses} w-full`}>
-          {t('register.dependents.finish')}
-        </button>
-      </div>
-    );
-  };
-
-  return (
-    // Solid background of its own: this page sits outside the site layout.
-    <div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-6xl bg-card rounded-[2rem] overflow-hidden grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:aspect-video">
-        <aside className="flex md:flex-col items-center md:items-start justify-between md:justify-center gap-6 p-8 md:p-10 border-b md:border-b-0 md:border-r border-hairline">
-          <img src={hLight} alt="Hack SP" className="h-9 md:h-12" />
-          <p className="hidden md:block text-sm opacity-45 leading-relaxed">{t('register.subtitle')}</p>
-
-          {step !== 'done' && (
-            <div
-              className="flex gap-1.5"
-              aria-label={t('register.step', {
-                current: String(stepNumber[step]),
-                total: String(totalSteps),
-              })}
-            >
-              {Array.from({ length: totalSteps }, (_, index) => (
-                <span
-                  key={index}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index < stepNumber[step] ? 'w-6 bg-primary' : 'w-3 bg-muted'
-                  }`}
+            <form onSubmit={handleAddDependent} className="flex flex-col gap-5">
+              {dependentFields.map((field) => (
+                <JoinField
+                  key={field.name}
+                  field={field}
+                  value={dependent[field.name] ?? ''}
+                  other={dependent[`${field.name}_other`] ?? ''}
+                  onChange={(name, value) => setDependent((prev) => ({ ...prev, [name]: value }))}
+                  t={t}
                 />
               ))}
-            </div>
-          )}
-        </aside>
 
-        {/* The card is a fixed 16:9 box, so a long step scrolls inside it. */}
-        <section className="flex flex-col justify-center gap-8 p-8 sm:p-10 md:p-12 md:overflow-y-auto">
-          <h1 className="text-xs font-medium uppercase tracking-[0.2em] opacity-35">{t('register.title')}</h1>
-          {/* Keyed by step so each transition replays the entrance instead of just swapping content. */}
-          <div key={step} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {renderStep()}
+              {error && <Feedback tone="error">{error}</Feedback>}
+
+              <button
+                type="submit"
+                disabled={busy}
+                className="w-full rounded-[10px] border-[1.5px] border-primary bg-primary px-6 py-4 font-display text-base font-bold text-white transition-colors hover:border-ink hover:bg-ink disabled:opacity-50"
+              >
+                {busy ? t('register.dependents.adding') : t('register.dependents.add')}
+              </button>
+            </form>
+
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem(STORAGE_KEY);
+                goTo('done');
+              }}
+              className="btn btn-outline w-full"
+            >
+              {t('register.dependents.finish')}
+            </button>
           </div>
         </section>
-      </div>
+      )}
+
+      {step === 'done' && (
+        <section className="mx-auto max-w-shell px-7 pb-24 pt-[88px]">
+          <div className="flex max-w-[680px] flex-col gap-5 rounded-2xl border border-line bg-surface-alt px-10 py-11">
+            <h2 className="m-0 font-display text-[34px] font-extrabold">{t('join.doneTitle')}</h2>
+            <p className="m-0 text-lg leading-[1.7] text-ink-soft">{t('join.doneBody')}</p>
+            <div className="mt-1 flex flex-wrap gap-3.5">
+              <a
+                href={configUrl.discordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-discord px-[26px]"
+              >
+                <DiscordIcon size={22} />
+                {t('community.joinServer')}
+              </a>
+              <Link to="/" className="btn btn-outline px-[26px]">
+                {t('register.success.home')}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
-};
+}
+
+function StepLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="m-0 mb-3 text-[13px] font-bold uppercase tracking-[0.14em] text-primary">
+      {children}
+    </p>
+  );
+}
+
+function Feedback({ tone, children }: { tone: 'error' | 'success'; children: ReactNode }) {
+  return (
+    <p
+      role={tone === 'error' ? 'alert' : 'status'}
+      className={`m-0 rounded-[10px] px-4 py-3 text-sm font-semibold ${
+        tone === 'error' ? 'bg-[#ffecec] text-primary-ink' : 'bg-[#e9f7f0] text-[#1a7f37]'
+      }`}
+    >
+      {children}
+    </p>
+  );
+}
+
+const INPUT_CLASS =
+  'rounded-[10px] border-[1.5px] border-[#d5d5d5] bg-surface px-4 py-3.5 text-base text-ink focus:border-primary focus:outline-none';
+
+function JoinField({
+  field,
+  value,
+  other,
+  onChange,
+  t,
+}: {
+  field: FieldConfig;
+  value: string;
+  other: string;
+  onChange: (name: string, value: string) => void;
+  t: ReturnType<typeof useLanguage>['t'];
+}) {
+  const label = (
+    <span className="text-sm font-semibold text-ink-soft">
+      {t(field.labelKey)}
+      {field.optional && (
+        <span className="font-normal text-ink-faint"> ({t('register.optional')})</span>
+      )}
+    </span>
+  );
+
+  if (field.type === 'select') {
+    return (
+      <div className="flex flex-col gap-2">
+        <label className="flex flex-col gap-2">
+          {label}
+          <select
+            required={!field.optional}
+            value={value}
+            onChange={(event) => onChange(field.name, event.target.value)}
+            className={INPUT_CLASS}
+          >
+            <option value="" disabled>
+              {field.placeholderKey ? t(field.placeholderKey) : ''}
+            </option>
+            {field.options?.map((option) => (
+              <option key={option.value} value={option.value}>
+                {t(option.labelKey)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {value === OTHER_OPTION_VALUE && (
+          <input
+            required
+            value={other}
+            onChange={(event) => onChange(`${field.name}_other`, event.target.value)}
+            placeholder={t('register.field.other.placeholder')}
+            className={INPUT_CLASS}
+          />
+        )}
+      </div>
+    );
+  }
+
+  const mask = FIELD_MASKS[field.name];
+
+  return (
+    <label className="flex flex-col gap-2">
+      {label}
+      <input
+        type={field.type}
+        inputMode={mask ? 'numeric' : undefined}
+        required={!field.optional}
+        value={value}
+        onChange={(event) =>
+          onChange(field.name, mask ? mask(event.target.value) : event.target.value)
+        }
+        placeholder={field.placeholderKey ? t(field.placeholderKey) : undefined}
+        className={INPUT_CLASS}
+      />
+    </label>
+  );
+}
