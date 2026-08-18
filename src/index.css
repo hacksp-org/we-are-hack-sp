@@ -118,9 +118,14 @@
   from {
     transform: translateX(0);
   }
+
   to {
-    transform: translateX(-50%);
+    transform: translateX(-25%);
   }
+}
+
+.animate-sponsor-marquee {
+  animation: sponsor-marquee 38s linear infinite;
 }
 
 .marquee-track {

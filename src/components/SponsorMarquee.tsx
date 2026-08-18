@@ -1,32 +1,41 @@
 import { sponsors } from '../constants/sponsors';
 
-/**
- * The list is rendered twice and the track slides by exactly -50%, so the
- * second copy lands where the first began and the loop has no seam.
- *
- * The spacing is `padding-right` on each item rather than a flex `gap`: a gap
- * sits *between* items, so 2N items have 2N-1 gaps and half the track width is
- * no longer exactly one copy — the loop drifts a little further out of step on
- * every pass. Padding travels with the item, which keeps both halves identical.
- */
-export function SponsorMarquee({ durationSeconds = 38 }: { durationSeconds?: number }) {
+export function SponsorMarquee() {
+  const groups = [0, 1, 2, 3];
+
   return (
-    <div className="marquee-mask relative overflow-hidden">
-      <div
-        className="marquee-track flex w-max items-center"
-        style={{ animationDuration: `${durationSeconds}s` }}
-      >
-        {[0, 1].map((copy) =>
-          sponsors.map((sponsor) => (
-            <img
-              key={`${copy}-${sponsor.alt}`}
-              src={sponsor.src}
-              alt={copy === 0 ? sponsor.alt : ''}
-              aria-hidden={copy === 1}
-              className="block h-8 w-auto flex-none pr-16 opacity-70 grayscale"
-            />
-          )),
-        )}
+    <div className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden py-4">
+      <div className="flex w-max animate-sponsor-marquee items-center">
+        {groups.map((group) => (
+          <div
+            key={group}
+            aria-hidden={group !== 0}
+            className="flex shrink-0 items-center"
+          >
+            {sponsors.map((sponsor) => {
+              const monochrome = sponsor.monochrome !== false;
+
+              return (
+                <div
+                  key={`${group}-${sponsor.alt}`}
+                  className="flex h-20 w-[220px] shrink-0 items-center justify-center px-7"
+                >
+                  <img
+                    src={sponsor.src}
+                    alt={group === 0 ? sponsor.alt : ''}
+                    draggable={false}
+                    className="max-h-10 max-w-[150px] select-none object-contain opacity-55"
+                    style={{
+                      filter: sponsor.monochrome === false
+                        ? 'none'
+                        : 'brightness(0) invert(1)',
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

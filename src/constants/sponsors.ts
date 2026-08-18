@@ -1,16 +1,22 @@
-import drConsulta from '../assets/sponsors/dr-consulta.webp';
-import imeUsp from '../assets/sponsors/ime-usp.png';
-import taqtile from '../assets/sponsors/taqtile.png';
-import hackclub from '../assets/sponsors/hackclub.png';
+const CDN_URL = import.meta.env.VITE_CDN_URL;
 
-export interface Sponsor {
-  src: string;
-  alt: string;
-}
-
-export const sponsors: Sponsor[] = [
-  { src: drConsulta, alt: 'Dr. Consulta' },
-  { src: imeUsp, alt: 'IME-USP' },
-  { src: taqtile, alt: 'Taqtile' },
-  { src: hackclub, alt: 'Hack Club' },
+export const sponsors = [
+  {
+    alt: 'Dr consulta',
+    src: `${CDN_URL}/sponsors/dr-consulta-blue.webp`,
+  },
+  {
+    alt: 'Hack Club',
+    src: `${CDN_URL}/sponsors/hackclub-white.png`,
+    gridSrc: `${CDN_URL}/sponsors/hackclub-black.png`,
+    monochrome: false,
+  },
+  {
+    alt: 'IME USP',
+    src: `${CDN_URL}/sponsors/ime-usp-blue.png`,
+  },
+  {
+    alt: 'Taqtile',
+    src: `${CDN_URL}/sponsors/taqtile-logo-black.png`,
+  },
 ];

@@ -1,8 +1,8 @@
 export const configUrl = {
-    githubUrl: "https://github.com/HACK-SP-BR",
+    githubUrl: "https://github.com/hacksp-org",
     donationUrl: "https://hcb.hackclub.com/donations/start/hack-sp",
-    discordUrl: "https://discord.gg/PtK6ytU8ME",
-    contactEmail: "contact@hacksp.org"
+    discordUrl: "https://discord.gg/kN4aTeVezX",
+    contactEmail: "contato@hacksp.org"
 } as const;
 
 // VITE_SUBSCRIBE_ENDPOINT may hold either the API origin or the full

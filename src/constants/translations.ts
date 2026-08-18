@@ -8,6 +8,7 @@ export const translations = {
     "join.notesLabel": "Quer contar algo pra gente? (opcional)",
     "join.notesPlaceholder": "Nunca programei, mas quero aprender",
     "join.formNote": "Enviamos um e-mail de confirmação com os próximos passos. Gratuito, e você pode sair da lista quando quiser.",
+    "join.talkEyebrow": "Comunidade",
     "join.talkTitle": "Prefere conversar antes?",
     "join.talkBody": "Entra no nosso servidor do Discord. Você pode perguntar o que quiser antes de se inscrever — não precisa saber programar.",
     "join.knowTitle": "Bom saber",
@@ -31,7 +32,7 @@ export const translations = {
 
     "community.title": "Nosso servidor no Discord",
     "community.body": "É o lugar para tirar dúvidas, encontrar seu time, mostrar o que você está construindo e conversar com outras pessoas que gostam de tecnologia.",
-    "community.joinServer": "Entrar no servidor",
+    "community.joinServer": "Entrar no Discord",
     "community.talkToTeam": "Falar com o time",
     "community.freeLabel": "Sempre gratuito",
     "community.freeTitle": "Todo evento do Hack SP custa R$ 0",
@@ -168,7 +169,7 @@ export const translations = {
     "event.location.title": "Sobre o Local",
     "home.discord.title": "Comunidade no Discord",
     "home.discord.p1": "Nosso servidor é o lugar para tirar dúvidas, encontrar seu time e conversar com outros apaixonados por tecnologia.",
-    "home.discord.cta": "Entrar no Servidor",
+    "home.discord.cta": "Entrar no Discord",
     "home.news.title": "Últimas Notícias",
     "home.news.cta": "Ler mais",
 
@@ -318,6 +319,7 @@ export const translations = {
     "join.notesLabel": "Anything you'd like to tell us? (optional)",
     "join.notesPlaceholder": "Never coded before, but I want to learn",
     "join.formNote": "We'll send a confirmation e-mail with the next steps. Free, and you can leave the list whenever you want.",
+    "join.talkEyebrow": "Community",
     "join.talkTitle": "Prefer to talk first?",
     "join.talkBody": "Come to our Discord server. You can ask anything before signing up — no experience required.",
     "join.knowTitle": "Good to know",

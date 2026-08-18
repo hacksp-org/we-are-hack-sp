@@ -102,7 +102,9 @@ function Hero() {
           <p className="m-0 mb-5 text-[13px] font-bold uppercase tracking-[0.14em] text-ink-faint">
             {t('home.trustedBy')}
           </p>
-          <SponsorMarquee />
+          <div className="[&_img]:brightness-0 [&_img]:invert">
+            <SponsorMarquee />
+          </div>
         </div>
       </div>
     </section>

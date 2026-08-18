@@ -355,28 +355,42 @@ export function Join() {
                 </h2>
 
                 <div className="flex flex-col gap-5">
-                  {commonFields.map((field) => (
-                    <JoinField
-                      key={field.name}
-                      field={field}
-                      value={values[field.name] ?? ''}
-                      other={values[`${field.name}_other`] ?? ''}
-                      onChange={setValue}
-                      t={t}
-                    />
-                  ))}
-
                   <div className="grid gap-4 sm:grid-cols-2">
-                    {detailFields.map((field) => (
-                      <JoinField
+                    {commonFields.map((field) => (
+                      <div
                         key={field.name}
-                        field={field}
-                        value={values[field.name] ?? ''}
-                        other={values[`${field.name}_other`] ?? ''}
-                        onChange={setValue}
-                        t={t}
-                      />
+                        className={field.name === 'phone' ? '' : 'sm:col-span-2'}
+                      >
+                        <JoinField
+                          field={field}
+                          value={values[field.name] ?? ''}
+                          other={values[`${field.name}_other`] ?? ''}
+                          onChange={setValue}
+                          t={t}
+                        />
+                      </div>
                     ))}
+
+                    {detailFields.map((field) => {
+                      const fullWidth =
+                        (category === 'guardian' && field.name === 'relationship') ||
+                        (category === 'teacher' && field.name === 'subject');
+
+                      return (
+                        <div
+                          key={field.name}
+                          className={fullWidth ? 'sm:col-span-2' : ''}
+                        >
+                          <JoinField
+                            field={field}
+                            value={values[field.name] ?? ''}
+                            other={values[`${field.name}_other`] ?? ''}
+                            onChange={setValue}
+                            t={t}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <label className="flex flex-col gap-2">
@@ -406,18 +420,24 @@ export function Join() {
               </form>
 
               <div className="flex flex-col gap-5">
-                <div className="relative overflow-hidden rounded-2xl bg-dark-alt px-[30px] py-8 text-white">
-                  <h3 className="relative m-0 mb-3.5 font-display text-[22px] font-bold text-white">
+                <div className="relative flex flex-col gap-[18px] overflow-hidden rounded-2xl bg-dark px-8 py-[34px] text-white">
+                  <img
+                    src={brandMarkWhite}
+                    alt=""
+                    className="absolute -bottom-[34px] -right-7 block h-40 w-auto opacity-[0.12]"
+                  />
+                  <p className="eyebrow relative m-0 text-[#ff5c5c]">{t('join.talkEyebrow')}</p>
+                  <h3 className="relative m-0 font-display text-[26px] font-bold text-white">
                     {t('join.talkTitle')}
                   </h3>
-                  <p className="relative m-0 mb-[22px] text-base leading-[1.7] text-[#c9c9c9]">
+                  <p className="relative m-0 text-base leading-[1.7] text-[#c9c9cf]">
                     {t('join.talkBody')}
                   </p>
                   <a
                     href={configUrl.discordUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-discord relative px-[26px]"
+                    className="btn btn-discord relative mt-1 self-start px-[26px]"
                   >
                     <DiscordIcon size={22} />
                     {t('community.joinServer')}
@@ -585,9 +605,12 @@ export function Join() {
 
 function StepLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="m-0 mb-3 text-[13px] font-bold uppercase tracking-[0.14em] text-primary">
-      {children}
-    </p>
+    <div className="mb-3 flex items-center gap-3">
+      <img src={brandMarkRed} alt="" className="block h-4 w-auto" />
+      <p className="m-0 text-[13px] font-bold uppercase tracking-[0.14em] text-primary">
+        {children}
+      </p>
+    </div>
   );
 }
 

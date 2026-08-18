@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { configUrl } from '../config/config';
 import { GitHubIcon } from './icons';
@@ -11,39 +11,64 @@ const NAV = [
   { href: '#apoie', key: 'nav.support' },
 ] as const;
 
-/**
- * Sticky, 73px, under the 4px red rule that runs across the top of the page.
- * Navigation is anchors into the single-page home, not routes.
- */
 export function Header() {
   const { language, toggleLanguage, t } = useLanguage();
+  const { pathname } = useLocation();
+
+  const isJoin = pathname === '/join';
 
   return (
     <>
       <div className="h-1 bg-primary" />
       <header className="sticky top-0 z-50 h-[73px] border-b border-line bg-surface">
         <div className="mx-auto flex h-full max-w-shell items-center justify-between gap-6 px-7">
-          <a href="#top" className="flex shrink-0 items-center gap-3">
-            <img
-              src={logoHorizontal}
-              alt="Hack SP"
-              className="block h-[38px] w-[133px] object-contain"
-            />
-          </a>
+          {pathname === '/' ? (
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex shrink-0 items-center gap-3 border-0 bg-transparent p-0"
+              aria-label="Voltar ao topo"
+            >
+              <img
+                src={logoHorizontal}
+                alt="Hack SP"
+                className="block h-[38px] w-[133px] object-contain"
+              />
+            </button>
+          ) : (
+            <Link to="/" className="flex shrink-0 items-center gap-3">
+              <img
+                src={logoHorizontal}
+                alt="Hack SP"
+                className="block h-[38px] w-[133px] object-contain"
+              />
+            </Link>
+          )}
 
           <nav className="flex items-center gap-4 lg:gap-6">
-            <div className="hidden items-center gap-6 lg:flex">
-              {NAV.map(({ href, key }) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
-                >
-                  {t(key)}
-                </a>
-              ))}
-              <span className="h-[22px] w-px bg-line" />
-            </div>
+            {!isJoin && (
+              <div className="hidden items-center gap-6 lg:flex">
+                {NAV.map(({ href, key }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    className="border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
+                  >
+                    {t(key)}
+                  </a>
+                ))}
+                <span className="h-[22px] w-px bg-line" />
+              </div>
+            )}
+
+            {isJoin && (
+              <Link
+                to="/"
+                className="hidden border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary sm:block"
+              >
+                ← {t('register.back')}
+              </Link>
+            )}
 
             <a
               href={configUrl.githubUrl}
@@ -63,12 +88,14 @@ export function Header() {
               {language === 'pt' ? 'EN' : 'PT'}
             </button>
 
-            <Link
-              to="/join"
-              className="rounded-[10px] border-[1.5px] border-primary bg-primary px-5 py-2.5 text-[15px] font-bold text-white transition-colors hover:border-ink hover:bg-ink"
-            >
-              {t('nav.join')}
-            </Link>
+            {!isJoin && (
+              <Link
+                to="/join"
+                className="rounded-[10px] border-[1.5px] border-primary bg-primary px-5 py-2.5 text-[15px] font-bold text-white transition-colors hover:border-ink hover:bg-ink"
+              >
+                {t('nav.join')}
+              </Link>
+            )}
           </nav>
         </div>
       </header>
