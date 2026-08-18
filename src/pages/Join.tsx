@@ -12,8 +12,9 @@ import {
   type FieldConfig,
   type RegistrationCategory,
 } from '../constants/registration';
+import brandMarkRed from '../assets/brand/brand-mark-red.png';
 import brandMarkWhite from '../assets/brand/brand-mark-white.png';
-import heroPhoto from '../assets/events/hero.jpeg';
+import heroPhoto from '../assets/events/join-hero.jpeg';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
@@ -75,6 +76,9 @@ export function Join() {
 
   const [code, setCode] = useState('');
   const [resending, setResending] = useState(false);
+  // Kept in the mockup for the person filling it in, not sent anywhere: the
+  // API has no field for it yet.
+  const [notes, setNotes] = useState('');
   const [dependent, setDependent] = useState<Record<string, string>>({});
   const [dependents, setDependents] = useState<string[]>([]);
 
@@ -278,16 +282,19 @@ export function Join() {
   };
 
   return (
-    <div className="min-h-screen bg-surface">
-      <div className="h-1 bg-primary" />
-
+    <>
       <section className="relative overflow-hidden bg-dark-alt">
         <img
           src={heroPhoto}
           alt=""
-          className="absolute inset-0 block h-full w-full object-cover opacity-25"
+          className="absolute inset-0 block h-full w-full object-cover opacity-[0.32]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,30,34,0.72)_0%,rgba(30,30,34,0.9)_100%)]" />
+        <img
+          src={brandMarkRed}
+          alt=""
+          className="absolute -bottom-[60px] -right-10 hidden h-[260px] w-auto opacity-25 md:block"
+        />
         <div className="relative z-[2] mx-auto max-w-shell px-7 pb-16 pt-[72px]">
           <div className="mb-5 flex items-center gap-3.5">
             <img src={brandMarkWhite} alt="" className="block h-[22px] w-auto" />
@@ -311,7 +318,7 @@ export function Join() {
             </h2>
 
             <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-4">
-              {categories.map(({ id, labelKey, descKey }) => {
+              {categories.map(({ id, icon: Icon, labelKey, descKey }) => {
                 const active = id === category;
                 return (
                   <button
@@ -325,6 +332,7 @@ export function Join() {
                         : 'border-2 border-line hover:border-ink-faint'
                     }`}
                   >
+                    <Icon size={22} className="mb-3 block text-primary" />
                     <span className="block font-display text-lg font-bold">{t(labelKey)}</span>
                     <span className="mt-1.5 block text-[15px] leading-[1.6] text-ink-muted">
                       {t(descKey)}
@@ -370,6 +378,18 @@ export function Join() {
                       />
                     ))}
                   </div>
+
+                  <label className="flex flex-col gap-2">
+                    <span className="text-sm font-semibold text-ink-soft">
+                      {t('join.notesLabel')}
+                    </span>
+                    <input
+                      value={notes}
+                      onChange={(event) => setNotes(event.target.value)}
+                      placeholder={t('join.notesPlaceholder')}
+                      className={INPUT_CLASS}
+                    />
+                  </label>
 
                   {error && <Feedback tone="error">{error}</Feedback>}
 
@@ -559,7 +579,7 @@ export function Join() {
           </div>
         </section>
       )}
-    </div>
+    </>
   );
 }
 

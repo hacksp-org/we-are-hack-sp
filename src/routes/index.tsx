@@ -6,10 +6,12 @@ import { Terms } from '../pages/Terms';
 import { Join } from '../pages/Join';
 
 /**
- * The redesign is one page plus two documents. About, Hackathons,
+ * The redesign is one page plus three documents. About, Hackathons,
  * Transparency, Support, FAQ and the per-event pages are gone — their content
- * either became an anchored section of the home page or was dropped, so the
- * header and footer link to `#sobre`, `#transparencia` and so on.
+ * either became an anchored section of the home page or was dropped.
+ *
+ * Registration sits inside the layout now: the redesign gives it the same
+ * header and footer, so there is always a way back to the site from it.
  */
 export const router = createBrowserRouter([
   {
@@ -17,10 +19,9 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
+      { path: 'join', element: <Join /> },
       { path: 'conduct', element: <Conduct /> },
       { path: 'terms', element: <Terms /> },
     ],
   },
-  // Standalone: registration stands apart, with no header or footer.
-  { path: '/join', element: <Join /> },
 ]);
