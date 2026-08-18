@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { configUrl } from '../config/config';
+import hackclubFlag from '../assets/hackclub_flag.svg';
 import { brand } from '../constants/cdn';
 
 const SITE_LINKS = [
@@ -28,7 +29,7 @@ export function Footer() {
           </p>
           <p className="m-0 text-[13px] text-ink-faint">{t('footer.sponsoredBy')}</p>
           <a href="https://hackclub.com" target="_blank" rel="noopener noreferrer" className="self-start">
-            <img src={brand.hackclubFlag} alt="Hack Club" className="block h-10 w-auto" />
+            <img src={hackclubFlag} alt="Hack Club" className="block h-10 w-auto" />
           </a>
         </div>
 
