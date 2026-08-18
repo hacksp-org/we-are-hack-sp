@@ -193,9 +193,6 @@ function About() {
             <h3 className="m-0 font-display text-2xl font-bold">{t('about.missionTitle')}</h3>
             <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('about.mission1')}</p>
             <p className="m-0 text-[17px] leading-[1.75] text-ink-soft">{t('about.mission2')}</p>
-            <blockquote className="m-0 mt-2 border border-line border-l-4 border-l-primary bg-surface px-6 py-5 font-display text-[17px] italic leading-[1.7] text-ink">
-              {t('about.quote')}
-            </blockquote>
           </div>
 
           <div data-reveal className="flex flex-col gap-[22px]">
