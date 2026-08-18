@@ -1,88 +1,112 @@
 import { useLanguage } from '../contexts/LanguageContext';
 import { useReveal } from '../hooks/useReveal';
-import type { LegalBlock } from '../constants/legal';
+import type { LegalBlock, LegalDocument } from '../constants/legal';
 import brandMarkRed from '../assets/brand/brand-mark-red.png';
 
 /**
- * Renders the long-form pages (code of conduct, terms) from their block list.
- * Consecutive `item` blocks are grouped into one list so the source can stay a
- * flat sequence.
+ * Opening band, then a 250px sticky index beside the text. The index is the
+ * only way to move around a document this long, so it stays on screen.
  */
-export function LegalPage({ blocks }: { blocks: LegalBlock[] }) {
+export function LegalPage({ document }: { document: LegalDocument }) {
   const { language } = useLanguage();
   useReveal();
 
+  return (
+    <>
+      <section className="border-b border-line bg-surface-alt">
+        <div className="mx-auto max-w-[900px] px-7 pb-[60px] pt-[72px]">
+          <div className="mb-5 flex items-center gap-3">
+            <img src={brandMarkRed} alt="" className="block h-[22px] w-auto" />
+            <p className="eyebrow m-0 text-primary">{document.eyebrow[language]}</p>
+          </div>
+          <h1 className="m-0 mb-[22px] font-display text-[32px] font-extrabold leading-[1.18] tracking-[-0.02em] md:text-[44px]">
+            {document.title[language]}
+          </h1>
+          <p className="m-0 text-[19px] leading-[1.7] text-ink-soft">{document.lead[language]}</p>
+        </div>
+      </section>
+
+      <div className="mx-auto grid max-w-shell items-start gap-14 px-7 pb-20 pt-16 lg:grid-cols-[250px_minmax(0,1fr)]">
+        <nav className="top-[110px] hidden flex-col gap-2.5 border-l-2 border-line pl-[18px] lg:sticky lg:flex">
+          {document.nav.map((group, index) => (
+            <div key={index} className="flex flex-col gap-2.5">
+              {group.label && (
+                <p
+                  className={`m-0 text-xs font-bold uppercase tracking-[0.14em] text-primary ${
+                    index > 0 ? 'mt-4' : ''
+                  }`}
+                >
+                  {group.label[language]}
+                </p>
+              )}
+              {group.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-semibold text-ink-soft transition-colors hover:text-primary"
+                >
+                  {link[language]}
+                </a>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        <article className="flex max-w-[760px] flex-col gap-[52px]">
+          {document.sections.map((section) => (
+            <section
+              key={section.id}
+              id={section.id}
+              data-reveal
+              className="flex scroll-mt-[110px] flex-col gap-4"
+            >
+              {groupBlocks(section.blocks).map((entry, index) =>
+                Array.isArray(entry) ? (
+                  <ul key={index} className="m-0 flex list-none flex-col gap-3 p-0">
+                    {entry.map((item, itemIndex) => (
+                      <li
+                        key={itemIndex}
+                        className="flex items-start gap-3 text-[17px] leading-[1.75] text-ink-soft"
+                      >
+                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        {item[language]}
+                      </li>
+                    ))}
+                  </ul>
+                ) : entry.kind === 'h2' ? (
+                  <h2 key={index} className="m-0 font-display text-[28px] font-bold">
+                    {entry[language]}
+                  </h2>
+                ) : entry.kind === 'h3' ? (
+                  <h3 key={index} className="m-0 mt-2 font-display text-lg font-bold">
+                    {entry[language]}
+                  </h3>
+                ) : (
+                  <p key={index} className="m-0 text-[17px] leading-[1.75] text-ink-soft">
+                    {entry[language]}
+                  </p>
+                ),
+              )}
+            </section>
+          ))}
+        </article>
+      </div>
+    </>
+  );
+}
+
+/** Consecutive `li` blocks become one list; everything else stays as it is. */
+function groupBlocks(blocks: LegalBlock[]): (LegalBlock | LegalBlock[])[] {
   const grouped: (LegalBlock | LegalBlock[])[] = [];
+
   blocks.forEach((block) => {
     const last = grouped[grouped.length - 1];
-    if (block.kind === 'item' && Array.isArray(last)) {
+    if (block.kind === 'li' && Array.isArray(last)) {
       last.push(block);
       return;
     }
-    grouped.push(block.kind === 'item' ? [block] : block);
+    grouped.push(block.kind === 'li' ? [block] : block);
   });
 
-  return (
-    <article className="mx-auto max-w-[820px] px-7 py-16 md:py-24">
-      {grouped.map((entry, index) => {
-        if (Array.isArray(entry)) {
-          return (
-            <ul key={index} data-reveal className="my-5 flex list-none flex-col gap-3 p-0">
-              {entry.map((item, itemIndex) => (
-                <li key={itemIndex} className="flex items-start gap-3 text-[17px] leading-[1.75] text-ink-soft">
-                  <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item[language]}
-                </li>
-              ))}
-            </ul>
-          );
-        }
-
-        const text = entry[language];
-
-        switch (entry.kind) {
-          case 'title':
-            return (
-              <h1
-                key={index}
-                data-reveal
-                className="m-0 mb-7 font-display text-[32px] font-extrabold leading-[1.18] tracking-[-0.02em] md:text-[44px]"
-              >
-                {text}
-              </h1>
-            );
-          case 'heading':
-            return (
-              <div key={index} data-reveal className="mb-5 mt-14 flex items-baseline gap-3.5">
-                <img src={brandMarkRed} alt="" className="block h-4 w-auto self-center" />
-                <h2 className="m-0 font-display text-[26px] font-bold md:text-[30px]">{text}</h2>
-              </div>
-            );
-          case 'subheading':
-            return (
-              <h3 key={index} data-reveal className="m-0 mb-2 mt-8 font-display text-xl font-bold">
-                {text}
-              </h3>
-            );
-          case 'link':
-            return (
-              <a
-                key={index}
-                href={entry.href}
-                data-reveal
-                className="mr-4 inline-block border-b border-primary py-1 text-[15px] font-bold text-primary-ink"
-              >
-                {text}
-              </a>
-            );
-          default:
-            return (
-              <p key={index} data-reveal className="my-4 text-[17px] leading-[1.8] text-ink-soft">
-                {text}
-              </p>
-            );
-        }
-      })}
-    </article>
-  );
+  return grouped;
 }

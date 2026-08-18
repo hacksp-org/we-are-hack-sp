@@ -1,6 +1,6 @@
 import { LegalPage } from './LegalPage';
-import { termsBlocks } from '../constants/legal';
+import { termsDocument } from '../constants/legal';
 
 export function Terms() {
-  return <LegalPage blocks={termsBlocks} />;
+  return <LegalPage document={termsDocument} />;
 }
