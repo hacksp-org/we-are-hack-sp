@@ -13,6 +13,7 @@ import {
   type RegistrationCategory,
 } from '../constants/registration';
 import { brand } from '../constants/cdn';
+import { LocationFields } from '../components/LocationFields';
 import heroPhoto from '../assets/events/join-hero.jpeg';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
@@ -148,6 +149,11 @@ export function Join() {
       const value = resolveValue(field, values);
       if (value || !field.optional) payload[field.name] = value;
     });
+
+    // UF e cidade não passam por `commonFields` porque a cidade depende da UF —
+    // o par é montado pelo LocationFields, fora da lista declarativa.
+    if (values.uf) payload.uf = values.uf;
+    if (values.city) payload.city = values.city.trim();
 
     try {
       const response = await fetch(apiUrl.registrations, {
@@ -369,6 +375,12 @@ export function Join() {
                         />
                       </div>
                     ))}
+
+                    <LocationFields
+                      uf={values.uf ?? ''}
+                      city={values.city ?? ''}
+                      onChange={setValue}
+                    />
 
                     {detailFields.map((field) => {
                       const fullWidth =
