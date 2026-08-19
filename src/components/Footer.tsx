@@ -41,6 +41,12 @@ export function Footer() {
         </FooterColumn>
 
         <FooterColumn title={t('footer.resources')}>
+          <Link
+            to="/hackathons"
+            className="text-[15px] text-[#e0e0e4] transition-colors hover:text-white"
+          >
+            {t('nav.hackathons')}
+          </Link>
           <Link to="/join" className="text-[15px] text-[#e0e0e4] transition-colors hover:text-white">
             {t('nav.join')}
           </Link>

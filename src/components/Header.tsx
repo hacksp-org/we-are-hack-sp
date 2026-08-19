@@ -16,6 +16,9 @@ export function Header() {
   const { pathname } = useLocation();
 
   const isJoin = pathname === '/join';
+  // As âncoras apontam para seções da home; fora dela, clicar não leva a lugar
+  // nenhum. Só o link de hackathons é rota e vale em qualquer página.
+  const isHome = pathname === '/';
 
   return (
     <>
@@ -48,15 +51,26 @@ export function Header() {
           <nav className="flex items-center gap-4 lg:gap-6">
             {!isJoin && (
               <div className="hidden items-center gap-6 lg:flex">
-                {NAV.map(({ href, key }) => (
-                  <a
-                    key={href}
-                    href={href}
-                    className="border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
-                  >
-                    {t(key)}
-                  </a>
-                ))}
+                {isHome &&
+                  NAV.map(({ href, key }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      className="border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
+                    >
+                      {t(key)}
+                    </a>
+                  ))}
+                <Link
+                  to="/hackathons"
+                  className={`border-b-2 py-1.5 text-[15px] font-semibold transition-colors hover:border-primary hover:text-primary ${
+                    pathname === '/hackathons'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-ink'
+                  }`}
+                >
+                  {t('nav.hackathons')}
+                </Link>
                 <span className="h-[22px] w-px bg-line" />
               </div>
             )}
