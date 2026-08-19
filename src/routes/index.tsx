@@ -4,7 +4,7 @@ import { Home } from '../pages/Home';
 import { Conduct } from '../pages/Conduct';
 import { Terms } from '../pages/Terms';
 import { Join } from '../pages/Join';
-import { Volunteer } from '../pages/Volunteer';
+import Volunteer from '../pages/Volunteer';
 
 /**
  * The redesign is one page plus three documents. About, Hackathons,
