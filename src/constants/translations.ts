@@ -28,7 +28,7 @@ export const translations = {
     "home.intro": "O Hack SP é um projeto feito por estudantes do Ensino Médio, dedicado a proporcionar experiências incríveis de hackathons para adolescentes em São Paulo. Você não precisa de experiência — só precisa começar a construir.",
     "home.emailPlaceholder": "seu@email.com",
     "home.joinDiscord": "Entrar no Discord",
-    "home.trustedBy": "O Hack SP foi confiado por",
+    "home.trustedBy": "O Hack SP só é possível graças aos nossos doadores!",
 
     "community.title": "Nosso servidor no Discord",
     "community.body": "É o lugar para tirar dúvidas, encontrar seu time, mostrar o que você está construindo e conversar com outras pessoas que gostam de tecnologia.",
@@ -74,7 +74,7 @@ export const translations = {
     "support.donateCta": "Fazer uma doação",
     "support.sponsorCta": "Falar sobre patrocínio",
 
-    "sponsors.eyebrow": "Confiado por",
+    "sponsors.eyebrow": "Obrigado para nossos apoiadores:",
     "sponsors.cta": "Quer a sua organização aqui?",
     "sponsors.ctaLink": "Fale com a gente sobre patrocínio.",
 
@@ -350,7 +350,7 @@ export const translations = {
     "home.intro": "Hack SP is a project run by high school students, dedicated to building great hackathon experiences for teenagers in São Paulo. No experience required — just show up and build.",
     "home.emailPlaceholder": "you@email.com",
     "home.joinDiscord": "Join the Discord",
-    "home.trustedBy": "Hack SP has been trusted by",
+    "home.trustedBy": "Hack SP is only possible because of our donors!",
 
     "community.title": "Our Discord server",
     "community.body": "It's the place to ask questions, find your team, share what you're building and talk to other people who like technology.",
@@ -396,7 +396,7 @@ export const translations = {
     "support.donateCta": "Make a donation",
     "support.sponsorCta": "Talk about sponsorship",
 
-    "sponsors.eyebrow": "Trusted by",
+    "sponsors.eyebrow": "Thanks to our sponsors:",
     "sponsors.cta": "Want your organization here?",
     "sponsors.ctaLink": "Talk to us about sponsorship.",
 
