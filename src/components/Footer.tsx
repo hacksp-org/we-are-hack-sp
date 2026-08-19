@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { configUrl } from '../config/config';
-import hackclubFlag from '../assets/hackclub_flag.svg';
-import logoHorizontalWhite from '../assets/brand/logo-horizontal-white-red.png';
+import { brand } from '../constants/cdn';
 
 const SITE_LINKS = [
   { href: '#comunidade', key: 'nav.community' },
@@ -20,7 +19,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-shell grid-cols-[repeat(auto-fit,minmax(230px,1fr))] items-start gap-12 px-7 pb-10 pt-16">
         <div className="flex flex-col gap-[18px]">
           <img
-            src={logoHorizontalWhite}
+            src={brand.logoHorizontalWhite}
             alt="Hack SP"
             className="block h-[34px] w-[119px] object-contain"
           />
@@ -29,7 +28,7 @@ export function Footer() {
           </p>
           <p className="m-0 text-[13px] text-ink-faint">{t('footer.sponsoredBy')}</p>
           <a href="https://hackclub.com" target="_blank" rel="noopener noreferrer" className="self-start">
-            <img src={hackclubFlag} alt="Hack Club" className="block h-10 w-auto" />
+            <img src={brand.hackclubFlag} alt="Hack Club" className="block h-10 w-auto" />
           </a>
         </div>
 

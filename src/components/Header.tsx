@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { configUrl } from '../config/config';
 import { GitHubIcon } from './icons';
-import logoHorizontal from '../assets/brand/logo-horizontal-black-red.png';
+import { brand } from '../constants/cdn';
 
 const NAV = [
   { href: '#comunidade', key: 'nav.community' },
@@ -30,7 +30,7 @@ export function Header() {
               aria-label="Voltar ao topo"
             >
               <img
-                src={logoHorizontal}
+                src={brand.logoHorizontalBlack}
                 alt="Hack SP"
                 className="block h-[38px] w-[133px] object-contain"
               />
@@ -38,7 +38,7 @@ export function Header() {
           ) : (
             <Link to="/" className="flex shrink-0 items-center gap-3">
               <img
-                src={logoHorizontal}
+                src={brand.logoHorizontalBlack}
                 alt="Hack SP"
                 className="block h-[38px] w-[133px] object-contain"
               />

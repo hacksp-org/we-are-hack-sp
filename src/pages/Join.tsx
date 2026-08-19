@@ -12,10 +12,6 @@ import {
   type FieldConfig,
   type RegistrationCategory,
 } from '../constants/registration';
-import brandMarkRed from '../assets/brand/brand-mark-red.png';
-import { LocationFields } from '../components/LocationFields';
-import brandMarkWhite from '../assets/brand/brand-mark-white.png';
-import heroPhoto from '../assets/events/join-hero.jpeg';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
@@ -297,13 +293,13 @@ export function Join() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,30,34,0.72)_0%,rgba(30,30,34,0.9)_100%)]" />
         <img
-          src={brandMarkRed}
+          src={brand.markRed}
           alt=""
           className="absolute -bottom-[60px] -right-10 hidden h-[260px] w-auto opacity-25 md:block"
         />
         <div className="relative z-[2] mx-auto max-w-shell px-7 pb-16 pt-[72px]">
           <div className="mb-5 flex items-center gap-3.5">
-            <img src={brandMarkWhite} alt="" className="block h-[22px] w-auto" />
+            <img src={brand.markWhite} alt="" className="block h-[22px] w-auto" />
             <p className="eyebrow m-0 text-white">{t('register.title')}</p>
           </div>
           <h1 className="m-0 mb-4 font-display text-[32px] font-extrabold leading-[1.15] tracking-[-0.02em] text-white md:text-[46px]">
@@ -434,7 +430,7 @@ export function Join() {
               <div className="flex flex-col gap-5">
                 <div className="relative flex flex-col gap-[18px] overflow-hidden rounded-2xl bg-dark px-8 py-[34px] text-white">
                   <img
-                    src={brandMarkWhite}
+                    src={brand.markWhite}
                     alt=""
                     className="absolute -bottom-[34px] -right-7 block h-40 w-auto opacity-[0.12]"
                   />
@@ -618,7 +614,7 @@ export function Join() {
 function StepLabel({ children }: { children: ReactNode }) {
   return (
     <div className="mb-3 flex items-center gap-3">
-      <img src={brandMarkRed} alt="" className="block h-4 w-auto" />
+      <img src={brand.markRed} alt="" className="block h-4 w-auto" />
       <p className="m-0 text-[13px] font-bold uppercase tracking-[0.14em] text-primary">
         {children}
       </p>
