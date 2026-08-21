@@ -154,6 +154,9 @@ export function Join() {
     // o par é montado pelo LocationFields, fora da lista declarativa.
     if (values.uf) payload.uf = values.uf;
     if (values.city) payload.city = values.city.trim();
+    // O campo tem estado próprio porque fica fora da grade de campos; sem isto,
+    // o que a pessoa escrevia era descartado no navegador.
+    if (notes.trim()) payload.notes = notes.trim();
 
     try {
       const response = await fetch(apiUrl.registrations, {

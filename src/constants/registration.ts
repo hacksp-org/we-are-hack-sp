@@ -98,7 +98,6 @@ export const categoryFields: Record<RegistrationCategory, FieldConfig[]> = {
       labelKey: 'register.field.school_name',
       placeholderKey: 'register.field.school_name.placeholder',
     },
-    { name: 'grade', type: 'text', labelKey: 'register.field.grade', placeholderKey: 'register.field.grade.placeholder' },
   ],
   school: [
     {
