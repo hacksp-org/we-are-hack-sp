@@ -91,16 +91,13 @@ export const categoryFields: Record<RegistrationCategory, FieldConfig[]> = {
     },
   ],
   student: [
-    // A data de nascimento é perguntada na inscrição do evento, onde ela serve
-    // ao termo do responsável e ao crachá. Perguntar duas vezes só produzia uma
-    // cópia que envelhecia sem ninguém usar.
+    { name: 'birth_date', type: 'date', labelKey: 'register.field.birth_date' },
     {
       name: 'school_name',
       type: 'text',
       labelKey: 'register.field.school_name',
       placeholderKey: 'register.field.school_name.placeholder',
     },
-    { name: 'grade', type: 'text', labelKey: 'register.field.grade', placeholderKey: 'register.field.grade.placeholder' },
   ],
   school: [
     {
