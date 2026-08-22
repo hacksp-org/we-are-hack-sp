@@ -61,8 +61,12 @@ export function LocationFields({ uf, city, onChange }: Props) {
 
   const cityDisabled = !uf || loading;
 
+  // O par ocupa a linha inteira e se divide internamente. Assim estado e cidade
+  // ficam sempre lado a lado, independente de quantas células os campos
+  // anteriores tenham ocupado — antes o telefone deslocava os dois e a cidade
+  // caía sozinha na linha de baixo.
   return (
-    <>
+    <div className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
       <label className="flex flex-col gap-2">
         <span className="text-sm font-semibold text-ink-soft">{t('register.field.uf')}</span>
         <select
@@ -115,6 +119,6 @@ export function LocationFields({ uf, city, onChange }: Props) {
           </select>
         )}
       </label>
-    </>
+    </div>
   );
 }
