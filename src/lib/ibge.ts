@@ -5,12 +5,11 @@
  * ela é buscada em vez de embutida: uma cópia no bundle envelheceria em silêncio,
  * e são 5.570 nomes que ninguém quer carregar de uma vez.
  *
- * O cache é por UF e vive enquanto a aba estiver aberta: quem troca de estado e
- * volta não paga a viagem de novo.
+ * O cache é do TanStack, por chave `['ibge','municipios',uf]` — antes havia um
+ * Map aqui dentro fazendo o mesmo trabalho pior, sem repetição em caso de falha
+ * e sem descartar o que ninguém mais usa.
  */
 const ENDPOINT = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados';
-
-const cache = new Map<string, string[]>();
 
 interface IbgeMunicipality {
   nome: string;
@@ -18,19 +17,11 @@ interface IbgeMunicipality {
 
 export async function fetchCities(uf: string, signal?: AbortSignal): Promise<string[]> {
   const key = uf.toUpperCase();
-  const cached = cache.get(key);
-  if (cached) return cached;
-
   const response = await fetch(`${ENDPOINT}/${key}/municipios`, { signal });
   if (!response.ok) {
     throw new Error(`IBGE respondeu ${response.status}`);
   }
 
   const data = (await response.json()) as IbgeMunicipality[];
-  const names = data
-    .map((item) => item.nome)
-    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
-  cache.set(key, names);
-  return names;
+  return data.map((item) => item.nome).sort((a, b) => a.localeCompare(b, 'pt-BR'));
 }

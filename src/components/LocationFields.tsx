@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { brazilianStates } from '../constants/states';
 import { useLanguage } from '../contexts/LanguageContext';
 import { fetchCities } from '../lib/ibge';
@@ -24,35 +24,19 @@ interface Props {
  */
 export function LocationFields({ uf, city, onChange }: Props) {
   const { t } = useLanguage();
-  // Guarda a UF junto do resultado para que tudo mais seja derivado: assim que
-  // `uf` muda, `loaded.uf` deixa de bater e a lista some sozinha, sem um efeito
-  // que limpe estado — que é onde esse tipo de componente costuma dessincronizar.
-  const [loaded, setLoaded] = useState<{
-    uf: string;
-    cities: string[];
-    failed: boolean;
-  } | null>(null);
 
-  useEffect(() => {
-    if (!uf) return;
+  // Uma consulta por UF. O cache do TanStack substitui o Map que este
+  // componente mantinha à mão: ir e voltar entre estados não repete a viagem,
+  // e agora a repetição em caso de falha de rede vem junto.
+  const { data, isFetching, isError } = useQuery({
+    queryKey: ['ibge', 'municipios', uf],
+    queryFn: ({ signal }) => fetchCities(uf, signal),
+    enabled: Boolean(uf),
+  });
 
-    const controller = new AbortController();
-
-    fetchCities(uf, controller.signal)
-      .then((cities) => setLoaded({ uf, cities, failed: false }))
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        console.warn('Não foi possível carregar os municípios do IBGE', error);
-        setLoaded({ uf, cities: [], failed: true });
-      });
-
-    return () => controller.abort();
-  }, [uf]);
-
-  const ready = loaded?.uf === uf;
-  const cities = ready ? loaded.cities : [];
-  const failed = ready ? loaded.failed : false;
-  const loading = Boolean(uf) && !ready;
+  const cities = data ?? [];
+  const failed = isError;
+  const loading = Boolean(uf) && isFetching;
 
   const handleUf = (next: string) => {
     onChange('uf', next);
