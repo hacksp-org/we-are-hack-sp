@@ -8,7 +8,7 @@ import { SponsorMarquee } from '../components/SponsorMarquee';
 import { sponsors } from '../constants/sponsors';
 import { useEvents } from '../hooks/useEvents';
 import { brand } from '../constants/cdn';
-import heroPhoto from '../assets/events/hero.jpeg';
+import heroPhoto from '../assets/events/hero.webp';
 
 export function Home() {
   useReveal();

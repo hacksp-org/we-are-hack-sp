@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { apiUrl, configUrl } from '../config/config';
@@ -14,7 +14,7 @@ import {
 } from '../constants/registration';
 import { brand } from '../constants/cdn';
 import { LocationFields } from '../components/LocationFields';
-import heroPhoto from '../assets/events/join-hero.jpeg';
+import heroPhoto from '../assets/events/join-hero.webp';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
@@ -83,6 +83,29 @@ export function Join() {
   const [dependents, setDependents] = useState<string[]>([]);
 
   const detailFields = categoryFields[category];
+
+  /**
+   * Quais campos da categoria ocupam a linha inteira.
+   *
+   * Alguns são largos por natureza — um select com opção "outro" revela um
+   * campo de texto ao lado, e espremê-lo em meia coluna fica apertado. O resto
+   * se divide em pares; se sobrar um ímpar, o último estreito estica, senão ele
+   * fica sozinho deixando metade da linha vazia.
+   */
+  const wideFields = useMemo(() => {
+    const naturallyWide = new Set(
+      detailFields
+        .filter((field) => field.type === 'select' && field.options?.length)
+        .map((field) => field.name),
+    );
+
+    const narrow = detailFields.filter((field) => !naturallyWide.has(field.name));
+    if (narrow.length % 2 === 1) {
+      naturallyWide.add(narrow[narrow.length - 1].name);
+    }
+
+    return naturallyWide;
+  }, [detailFields]);
 
   useEffect(() => {
     const stored = readPending();
@@ -364,11 +387,11 @@ export function Join() {
 
                 <div className="flex flex-col gap-5">
                   <div className="grid gap-4 sm:grid-cols-2">
+                    {/* Todos ocupam a linha inteira: o telefone era o único
+                        estreito, e sozinho deixava metade da linha vazia além
+                        de empurrar o estado para a linha do telefone. */}
                     {commonFields.map((field) => (
-                      <div
-                        key={field.name}
-                        className={field.name === 'phone' ? '' : 'sm:col-span-2'}
-                      >
+                      <div key={field.name} className="sm:col-span-2">
                         <JoinField
                           field={field}
                           value={values[field.name] ?? ''}
@@ -385,15 +408,10 @@ export function Join() {
                       onChange={setValue}
                     />
 
-                    {detailFields.map((field) => {
-                      const fullWidth =
-                        (category === 'guardian' && field.name === 'relationship') ||
-                        (category === 'teacher' && field.name === 'subject');
-
-                      return (
+                    {detailFields.map((field) => (
                         <div
                           key={field.name}
-                          className={fullWidth ? 'sm:col-span-2' : ''}
+                          className={wideFields.has(field.name) ? 'sm:col-span-2' : ''}
                         >
                           <JoinField
                             field={field}
@@ -403,8 +421,7 @@ export function Join() {
                             t={t}
                           />
                         </div>
-                      );
-                    })}
+                    ))}
                   </div>
 
                   <label className="flex flex-col gap-2">
