@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { fetchEvents, type EventInfo } from '../constants/events';
+import { EVENTS_QUERY_KEY } from './useHackathons';
 import daydreamFallback from '../assets/events/daydream-fallback.webp';
 import drxFallback from '../assets/events/drx-fallback.webp';
 
@@ -54,29 +55,14 @@ const toCard = (event: EventInfo): EventCard => ({
 });
 
 export function useEvents() {
-  const [cards, setCards] = useState<EventCard[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Mesma chave do `useHackathons`: os dois compartilham uma única busca do
+  // `events.json`, em vez de pedirem o arquivo cada um por sua conta.
+  const { data, isPending } = useQuery({
+    queryKey: EVENTS_QUERY_KEY,
+    queryFn: fetchEvents,
+  });
 
-  useEffect(() => {
-    let active = true;
+  const list = Object.values(data ?? {}).map(toCard);
 
-    fetchEvents()
-      .then((map) => {
-        if (!active) return;
-        const list = Object.values(map).map(toCard);
-        setCards(list.length > 0 ? list : FALLBACK);
-      })
-      .catch(() => {
-        if (active) setCards(FALLBACK);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  return { cards: cards ?? [], loading };
+  return { cards: list.length > 0 ? list : FALLBACK, loading: isPending };
 }
