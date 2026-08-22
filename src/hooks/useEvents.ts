@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchEvents, type EventInfo } from '../constants/events';
-import daydreamFallback from '../assets/events/daydream-fallback.jpeg';
-import drxFallback from '../assets/events/drx-fallback.jpeg';
+import daydreamFallback from '../assets/events/daydream-fallback.webp';
+import drxFallback from '../assets/events/drx-fallback.webp';
 
 export interface EventCard {
   id: string;

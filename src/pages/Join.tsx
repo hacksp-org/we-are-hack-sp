@@ -14,7 +14,7 @@ import {
 } from '../constants/registration';
 import { brand } from '../constants/cdn';
 import { LocationFields } from '../components/LocationFields';
-import heroPhoto from '../assets/events/join-hero.jpeg';
+import heroPhoto from '../assets/events/join-hero.webp';
 
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
