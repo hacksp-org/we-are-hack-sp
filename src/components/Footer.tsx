@@ -56,6 +56,9 @@ export function Footer() {
           <Link to="/terms" className="text-[15px] text-[#e0e0e4] transition-colors hover:text-white">
             {t('footer.terms')}
           </Link>
+          <Link to="/safeguarding" className="text-[15px] text-[#e0e0e4] transition-colors hover:text-white">
+            {t('footer.safeguarding')}
+          </Link>
           <FooterLink href="https://hcb.hackclub.com/hack-sp/transactions" external>
             {t('footer.hcb')}
           </FooterLink>
