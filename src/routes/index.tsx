@@ -3,6 +3,7 @@ import { Layout } from '../layouts/Layout';
 import { Home } from '../pages/Home';
 import { Conduct } from '../pages/Conduct';
 import { Terms } from '../pages/Terms';
+import { Safeguarding } from '../pages/Safeguarding';
 import { Hackathons } from '../pages/Hackathons';
 import { Join } from '../pages/Join';
 import Volunteer from '../pages/Volunteer';
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: 'join', element: <Join /> },
       { path: 'conduct', element: <Conduct /> },
       { path: 'terms', element: <Terms /> },
+      { path: 'safeguarding', element: <Safeguarding /> },
       { path: 'volunteer', element: <Volunteer /> },
     ],
   },
