@@ -1,6 +1,5 @@
-import { LegalPage } from './LegalPage';
-import { conductDocument } from '../constants/legal';
+import { LegalMarkdownPage } from './LegalMarkdownPage';
 
 export function Conduct() {
-  return <LegalPage document={conductDocument} />;
+  return <LegalMarkdownPage slug="conduct" />;
 }

@@ -1,6 +1,5 @@
-import { LegalPage } from './LegalPage';
-import { termsDocument } from '../constants/legal';
+import { LegalMarkdownPage } from './LegalMarkdownPage';
 
 export function Terms() {
-  return <LegalPage document={termsDocument} />;
+  return <LegalMarkdownPage slug="terms" />;
 }
