@@ -11,13 +11,18 @@ const NAV = [
   { href: '#apoie', key: 'nav.support' },
 ] as const;
 
+const NAV_LINK_CLASS =
+  'border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary';
+
 export function Header() {
   const { language, toggleLanguage, t } = useLanguage();
   const { pathname } = useLocation();
 
   const isJoin = pathname === '/join';
-  // As âncoras apontam para seções da home; fora dela, clicar não leva a lugar
-  // nenhum. Só o link de hackathons é rota e vale em qualquer página.
+  // As âncoras apontam para seções da home. Dentro dela são `<a href="#x">`, que
+  // o navegador rola sozinho; fora dela viram rota para `/#x`, e o Layout faz a
+  // rolagem quando a home monta. Escondê-las fora da home — que foi o que eu
+  // tinha feito — deixava termos e conduta com um menu de um item só.
   const isHome = pathname === '/';
 
   return (
@@ -51,16 +56,17 @@ export function Header() {
           <nav className="flex items-center gap-4 lg:gap-6">
             {!isJoin && (
               <div className="hidden items-center gap-6 lg:flex">
-                {isHome &&
-                  NAV.map(({ href, key }) => (
-                    <a
-                      key={href}
-                      href={href}
-                      className="border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
-                    >
+                {NAV.map(({ href, key }) =>
+                  isHome ? (
+                    <a key={href} href={href} className={NAV_LINK_CLASS}>
                       {t(key)}
                     </a>
-                  ))}
+                  ) : (
+                    <Link key={href} to={`/${href}`} className={NAV_LINK_CLASS}>
+                      {t(key)}
+                    </Link>
+                  ),
+                )}
                 <Link
                   to="/hackathons"
                   className={`border-b-2 py-1.5 text-[15px] font-semibold transition-colors hover:border-primary hover:text-primary ${
