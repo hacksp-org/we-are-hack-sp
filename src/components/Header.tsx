@@ -95,9 +95,21 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
-              className="flex items-center text-ink transition-colors hover:text-primary"
+              className="hidden items-center text-ink transition-colors hover:text-primary sm:flex"
             >
               <GitHubIcon size={22} />
+            </a>
+
+            {/* O account é onde a pessoa se inscreve num evento, assina a
+                autorização e mostra o QR do crachá. Sem uma porta visível aqui
+                ele só se alcança pelo link de um e-mail, e quem procurar o
+                próprio cadastro não acha. Fica ao lado do "Inscreva-se" porque
+                são as duas metades da mesma coisa: entrar e voltar. */}
+            <a
+              href={configUrl.accountUrl}
+              className="hidden whitespace-nowrap border-b-2 border-transparent py-1.5 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary sm:block"
+            >
+              {t('nav.account')}
             </a>
 
             <button
@@ -111,7 +123,7 @@ export function Header() {
             {!isJoin && (
               <Link
                 to="/join"
-                className="rounded-[10px] border-[1.5px] border-primary bg-primary px-5 py-2.5 text-[15px] font-bold text-white transition-colors hover:border-ink hover:bg-ink"
+                className="whitespace-nowrap rounded-[10px] border-[1.5px] border-primary bg-primary px-5 py-2.5 text-[15px] font-bold text-white transition-colors hover:border-ink hover:bg-ink"
               >
                 {t('nav.join')}
               </Link>

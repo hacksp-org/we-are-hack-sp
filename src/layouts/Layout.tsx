@@ -4,7 +4,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 
 /**
- * Rola até a seção quando a URL traz um `#`.
+ * Para onde a página rola a cada navegação: topo, ou a seção da âncora.
  *
  * O navegador só faz isso sozinho num carregamento de página inteira. Numa
  * navegação do router — que é o que acontece ao clicar em "Transparência"
@@ -14,8 +14,25 @@ import { Footer } from '../components/Footer';
  * A seção pode não existir no primeiro quadro, porque a home ainda está
  * montando; por isso a segunda tentativa no quadro seguinte.
  */
-function useScrollToHash() {
+function useScrollOnNavigation() {
   const { hash, pathname } = useLocation();
+
+  /**
+   * Sem `#`, toda troca de rota começa no topo.
+   *
+   * O navegador guarda a posição da rolagem por documento, e numa SPA o
+   * documento nunca muda: sair do fim do `/join` para o `/conduct` montava a
+   * página nova já rolada no meio, como se ela tivesse aberto quebrada. O
+   * O efeito abaixo só cobria o caso com âncora.
+   *
+   * `instant` de propósito: o `smooth` do caso com âncora faz sentido porque a
+   * pessoa continua na mesma página, aqui ela trocou de página e ver a anterior
+   * deslizando para fora não informa nada.
+   */
+  useEffect(() => {
+    if (hash) return;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname, hash]);
 
   useEffect(() => {
     if (!hash) return;
@@ -47,7 +64,7 @@ function useScrollToHash() {
  * their own background and rules, so each one owns its horizontal gutter.
  */
 export function Layout() {
-  useScrollToHash();
+  useScrollOnNavigation();
 
   return (
     <div className="flex min-h-screen flex-col">

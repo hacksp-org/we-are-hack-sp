@@ -32,9 +32,11 @@ export const translations = {
     "join.codeLead": "Enviamos um código de 6 dígitos para o seu e-mail. Digite ele abaixo para concluir sua inscrição.",
     "join.codeHelp": "Não recebeu? Olhe o spam ou escreva para contact@hacksp.org.",
     "join.doneTitle": "Inscrição concluída!",
-    "join.doneBody": "Recebemos seus dados. Confira sua caixa de entrada para o e-mail de confirmação — e passa no Discord pra dar um oi enquanto espera.",
+    "join.goToAccount": "Ir para minha conta",
+    "join.doneBody": "Recebemos seus dados. O próximo passo é a sua conta: é por lá que você se inscreve nos hackathons, assina a autorização e mostra o QR do crachá na entrada. Entre com este mesmo e-mail — a gente manda um código, sem senha.",
 
     "nav.community": "Comunidade",
+    "nav.account": "Minha conta",
     "nav.sponsors": "Patrocinadores",
 
     "home.eyebrow": "Hackathons feitos por estudantes · São Paulo",
@@ -43,6 +45,10 @@ export const translations = {
     "home.emailPlaceholder": "seu@email.com",
     "home.joinDiscord": "Entrar no Discord",
     "home.trustedBy": "O Hack SP só é possível graças aos nossos parceiros!",
+
+    "home.nextEventEyebrow": "Próximo evento",
+    "home.nextEventCta": "Quero participar",
+    "home.nextEventDetails": "Ver detalhes",
 
     "community.title": "Nosso servidor no Discord",
     "community.body": "É o lugar para tirar dúvidas, encontrar seu time, mostrar o que você está construindo e conversar com outras pessoas que gostam de tecnologia.",
@@ -303,7 +309,7 @@ export const translations = {
     "register.dependents.unverified": "Confirme seu e-mail antes de adicionar dependentes.",
     "register.dependents.badSig": "Não foi possível validar sua inscrição. Comece de novo para adicionar dependentes.",
 
-    "register.error.duplicate": "Este e-mail já está inscrito.",
+    "register.error.duplicate": "Este e-mail já está inscrito. Se você ainda não confirmou o cadastro, entre em {account} com este e-mail — o código que chega por lá conclui a confirmação.",
     "register.error.invalid": "Confira os campos — algum dado não foi aceito.",
     "register.error.rateLimit": "Muitas tentativas. Aguarde um instante e tente de novo.",
     "register.error.emailFailed": "Sua inscrição foi salva, mas não conseguimos enviar o e-mail com o código. Fale com a gente em {email} para concluir.",
@@ -367,9 +373,11 @@ export const translations = {
     "join.codeLead": "We sent a 6-digit code to your e-mail. Type it below to finish your registration.",
     "join.codeHelp": "Didn't get it? Check your spam folder or write to contact@hacksp.org.",
     "join.doneTitle": "Registration complete!",
-    "join.doneBody": "We got your details. Check your inbox for the confirmation e-mail — and come say hi on Discord while you wait.",
+    "join.goToAccount": "Go to my account",
+    "join.doneBody": "We got your details. Your account is the next step: that is where you register for hackathons, sign the authorisation and show your badge QR code at the door. Sign in with this same e-mail — we send you a code, no password.",
 
     "nav.community": "Community",
+    "nav.account": "My account",
     "nav.sponsors": "Sponsors",
 
     "home.eyebrow": "Student-led hackathons · São Paulo",
@@ -378,6 +386,10 @@ export const translations = {
     "home.emailPlaceholder": "you@email.com",
     "home.joinDiscord": "Join the Discord",
     "home.trustedBy": "Hack SP is only possible because of our partners!",
+
+    "home.nextEventEyebrow": "Next event",
+    "home.nextEventCta": "I want to join",
+    "home.nextEventDetails": "See details",
 
     "community.title": "Our Discord server",
     "community.body": "It's the place to ask questions, find your team, share what you're building and talk to other people who like technology.",
@@ -639,7 +651,7 @@ export const translations = {
     "register.dependents.unverified": "Confirm your email before adding dependents.",
     "register.dependents.badSig": "We couldn't validate your registration. Please start over to add dependents.",
 
-    "register.error.duplicate": "This email is already registered.",
+    "register.error.duplicate": "This email is already registered. If you have not confirmed your sign-up yet, sign in at {account} with this address — the code sent there completes the confirmation.",
     "register.error.invalid": "Please check the fields — some data wasn't accepted.",
     "register.error.rateLimit": "Too many attempts. Please wait a moment and try again.",
     "register.error.emailFailed": "Your registration was saved, but we couldn't send the email with the code. Reach out to us at {email} to finish it.",

@@ -1,24 +1,30 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useReveal } from '../hooks/useReveal';
 import { configUrl } from '../config/config';
 import { DiscordIcon } from '../components/icons';
 import { SponsorMarquee } from '../components/SponsorMarquee';
 import { sponsors } from '../constants/sponsors';
-import { useEvents } from '../hooks/useEvents';
+import { useEvents, type EventCard } from '../hooks/useEvents';
 import { brand } from '../constants/cdn';
+import type { EventInfo } from '../constants/events';
 import heroPhoto from '../assets/events/hero.webp';
 
 export function Home() {
   useReveal();
+  // Buscado uma vez aqui e distribuído: o destaque e a faixa do histórico
+  // saem do mesmo arquivo, e um `useEvents` em cada um faria a home pedir o
+  // mesmo JSON duas vezes.
+  const { cards, upcoming, loading } = useEvents();
 
   return (
     <>
       <span id="top" />
       <Hero />
+      <FeaturedEvent event={upcoming} />
       <Community />
-      <About />
+      <About cards={cards} loading={loading} />
       <Transparency />
       <Support />
       <Sponsors />
@@ -110,6 +116,94 @@ function Hero() {
   );
 }
 
+/**
+ * O próximo evento, em destaque abaixo do hero.
+ *
+ * Sai do mesmo `events.json` que a vitrine e o /hackathons, então anunciar um
+ * evento novo é editar o conteúdo pelo painel — não precisa de deploy do site.
+ * Sem nenhum evento marcado como `upcoming` a seção simplesmente não existe,
+ * em vez de abrir um espaço vazio entre o hero e a comunidade.
+ *
+ * Continua dark para ler como continuação do hero, e não como a primeira das
+ * seções de conteúdo.
+ *
+ * Sem `data-reveal`: o `useReveal` varre o DOM uma vez só, no mount da página,
+ * e esta seção só passa a existir quando o `events.json` responde. Marcada, ela
+ * não seria observada por ninguém e ficaria em `opacity: 0` para sempre —
+ * invisível, ocupando o espaço dela. Vale para qualquer bloco que dependa de
+ * rede para aparecer.
+ */
+function FeaturedEvent({ event }: { event: EventInfo | null }) {
+  const { t, language } = useLanguage();
+
+  if (!event) return null;
+
+  const copy = event.translations[language] ?? event.translations.pt;
+  const cover = event.bannerUrl ?? event.photos[0];
+  const meta = [copy.date, copy.location].filter(Boolean).join(' · ');
+
+  return (
+    <section className="border-t border-white/[0.12] bg-dark">
+      <div className="mx-auto max-w-shell px-7 py-[72px]">
+        <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+          {cover && (
+            // Proporção, nunca altura fixa. 2410x612 é a proporção em que os
+            // banners são entregues, então no desktop a arte aparece inteira.
+            // No celular uma faixa de 3.94:1 viraria um fio de 80px de altura,
+            // então a caixa engorda para 2.5:1 e o `object-cover` mostra os 63%
+            // centrais — o conteúdo da arte ocupa os 38% do meio e cabe neles.
+            <div className="aspect-[5/2] overflow-hidden border border-white/[0.12] bg-dark-alt md:aspect-[2410/612]">
+              <img
+                src={cover}
+                alt={event.name}
+                className="block h-full w-full object-cover"
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col items-start gap-4">
+            <p className="eyebrow m-0 text-[#ff5c5c]">{t('home.nextEventEyebrow')}</p>
+
+            <h2 className="m-0 font-display text-[32px] font-extrabold leading-[1.15] text-white md:text-[42px]">
+              {event.name}
+            </h2>
+
+            {meta && <p className="m-0 text-[15px] font-semibold text-[#c9c9cf]">{meta}</p>}
+
+            <p className="m-0 max-w-[56ch] text-[17px] leading-[1.7] text-[#dcdcdc]">
+              {copy.description}
+            </p>
+
+            <div className="mt-2 flex flex-wrap gap-3">
+              {event.registrationUrl ? (
+                <a
+                  href={event.registrationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary px-7 py-3.5 text-base"
+                >
+                  {t('home.nextEventCta')}
+                </a>
+              ) : (
+                <Link to="/join" className="btn btn-primary px-7 py-3.5 text-base">
+                  {t('home.nextEventCta')}
+                </Link>
+              )}
+
+              <Link
+                to="/hackathons"
+                className="btn border-white/[0.28] px-7 py-3.5 text-base text-white"
+              >
+                {t('home.nextEventDetails')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SectionHeading({ number, title }: { number: string; title: string }) {
   return (
     <div data-reveal className="mb-11 flex items-baseline gap-4">
@@ -177,9 +271,8 @@ function Community() {
   );
 }
 
-function About() {
+function About({ cards, loading }: { cards: EventCard[]; loading: boolean }) {
   const { t, language } = useLanguage();
-  const { cards, loading } = useEvents();
   const steps = ['01', '02', '03', '04'] as const;
 
   return (

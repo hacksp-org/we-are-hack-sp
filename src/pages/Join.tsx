@@ -205,7 +205,12 @@ export function Join() {
         return;
       }
 
-      setError(t(errorKeyForStatus(response.status), { email: configUrl.contactEmail }));
+      setError(
+        t(errorKeyForStatus(response.status), {
+          email: configUrl.contactEmail,
+          account: configUrl.accountUrl.replace(/^https?:\/\//, ''),
+        }),
+      );
     } catch {
       setError(t('register.error.generic'));
     } finally {
@@ -479,9 +484,18 @@ export function Join() {
                   <h3 className="m-0 font-display text-xl font-bold">{t('join.knowTitle')}</h3>
                   <p className="m-0 text-[15px] leading-[1.7] text-ink-soft">{t('join.know1')}</p>
                   <p className="m-0 text-[15px] leading-[1.7] text-ink-soft">{t('join.know2')}</p>
-                  <Link to="/conduct" className="link-underline">
+                  {/* Nova aba de propósito: o formulário ao lado tem dados
+                      digitados, e o localStorage só guarda a inscrição depois
+                      de enviada. Sair daqui no meio do preenchimento volta com
+                      os campos vazios — o link do Discord acima já abre assim. */}
+                  <a
+                    href="/conduct"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-underline"
+                  >
                     {t('join.readConduct')}
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>
@@ -614,6 +628,9 @@ export function Join() {
             <h2 className="m-0 font-display text-[34px] font-extrabold">{t('join.doneTitle')}</h2>
             <p className="m-0 text-lg leading-[1.7] text-ink-soft">{t('join.doneBody')}</p>
             <div className="mt-1 flex flex-wrap gap-3.5">
+              <a href={configUrl.accountUrl} className="btn btn-primary px-[26px]">
+                {t('join.goToAccount')}
+              </a>
               <a
                 href={configUrl.discordUrl}
                 target="_blank"
