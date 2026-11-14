@@ -44,6 +44,8 @@ export const translations = {
     "home.intro": "O Hack SP é um projeto feito por estudantes do Ensino Médio, dedicado a proporcionar experiências incríveis de hackathons para adolescentes em São Paulo. Você não precisa de experiência — só precisa começar a construir.",
     "home.emailPlaceholder": "seu@email.com",
     "home.joinDiscord": "Entrar no Discord",
+    "home.alreadyRegistered": "Já se inscreveu?",
+    "home.goToAccount": "Acesse sua conta",
     "home.trustedBy": "O Hack SP só é possível graças aos nossos parceiros!",
 
     "home.nextEventEyebrow": "Próximo evento",
@@ -385,6 +387,8 @@ export const translations = {
     "home.intro": "Hack SP is a project run by high school students, dedicated to building great hackathon experiences for teenagers in São Paulo. No experience required — just show up and build.",
     "home.emailPlaceholder": "you@email.com",
     "home.joinDiscord": "Join the Discord",
+    "home.alreadyRegistered": "Already signed up?",
+    "home.goToAccount": "Go to your account",
     "home.trustedBy": "Hack SP is only possible because of our partners!",
 
     "home.nextEventEyebrow": "Next event",

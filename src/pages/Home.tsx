@@ -100,6 +100,20 @@ function Hero() {
                 {t('home.joinDiscord')}
               </a>
             </div>
+
+            {/* Metade das pessoas que chegam aqui já se cadastraram e estão
+                procurando o próprio crachá ou a inscrição no evento, não o
+                formulário. Sem esta linha, o caminho delas é o link de um
+                e-mail antigo. */}
+            <p className="m-0 text-[15px] text-[#c9c9cf]">
+              {t('home.alreadyRegistered')}{' '}
+              <a
+                href={configUrl.accountUrl}
+                className="font-bold text-white underline decoration-[#ff5c5c] decoration-2 underline-offset-4 hover:text-[#ff5c5c]"
+              >
+                {t('home.goToAccount')}
+              </a>
+            </p>
           </form>
         </div>
 
