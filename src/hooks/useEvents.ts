@@ -53,8 +53,29 @@ const toCard = (event: EventInfo): EventCard => ({
   },
 });
 
-export function useEvents() {
-  const [cards, setCards] = useState<EventCard[] | null>(null);
+interface HomeEvents {
+  /** Os que já aconteceram, como cartão, para a faixa do histórico. */
+  cards: EventCard[];
+  /** O próximo, inteiro, para o destaque no topo da home. */
+  upcoming: EventInfo | null;
+  loading: boolean;
+}
+
+/**
+ * Os eventos da home, separados pelo papel que cada um cumpre na página.
+ *
+ * A faixa do histórico se chama "o que já fizemos" e carimbava cada cartão com
+ * "Evento passado" — mas a lista vinha sem filtro de `status`, então o próximo
+ * evento apareceria lá dentro, anunciado como coisa que já aconteceu. Separar
+ * aqui mantém o carimbo verdadeiro em vez de removê-lo da tela.
+ *
+ * Os dois saem da mesma requisição de propósito: a home já busca este arquivo
+ * uma vez, e um segundo `fetch` do mesmo JSON para achar o destaque sairia
+ * caro à toa.
+ */
+export function useEvents(): HomeEvents {
+  const [events, setEvents] = useState<EventInfo[] | null>(null);
+  const [failed, setFailed] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,12 +83,10 @@ export function useEvents() {
 
     fetchEvents()
       .then((map) => {
-        if (!active) return;
-        const list = Object.values(map).map(toCard);
-        setCards(list.length > 0 ? list : FALLBACK);
+        if (active) setEvents(Object.values(map));
       })
       .catch(() => {
-        if (active) setCards(FALLBACK);
+        if (active) setFailed(true);
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -78,5 +97,13 @@ export function useEvents() {
     };
   }, []);
 
-  return { cards: cards ?? [], loading };
+  const past = events?.filter((event) => event.status === 'past').map(toCard) ?? [];
+
+  return {
+    cards: failed || (events !== null && past.length === 0) ? FALLBACK : past,
+    // O arquivo é editado à mão; se dois forem marcados como próximos, o
+    // destaque é do primeiro em vez da página escolher sozinha.
+    upcoming: events?.find((event) => event.status === 'upcoming') ?? null,
+    loading,
+  };
 }

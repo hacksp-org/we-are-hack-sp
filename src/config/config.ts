@@ -2,7 +2,11 @@ export const configUrl = {
     githubUrl: "https://github.com/hacksp-org",
     donationUrl: "https://hcb.hackclub.com/donations/start/hack-sp",
     discordUrl: "https://discord.gg/kN4aTeVezX",
-    contactEmail: "contato@hacksp.org"
+    contactEmail: "contato@hacksp.org",
+    // Onde quem já está inscrito entra. Entrar com o código enviado por
+    // e-mail também marca o e-mail como verificado, e é por isso que a
+    // mensagem de e-mail duplicado aponta para cá.
+    accountUrl: "https://account.hacksp.org"
 } as const;
 
 // VITE_SUBSCRIBE_ENDPOINT may hold either the API origin or the full

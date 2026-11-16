@@ -50,6 +50,9 @@ export function Footer() {
           <Link to="/join" className="text-[15px] text-[#e0e0e4] transition-colors hover:text-white">
             {t('nav.join')}
           </Link>
+          <FooterLink href={configUrl.accountUrl} external>
+            {t('nav.account')}
+          </FooterLink>
           <Link to="/conduct" className="text-[15px] text-[#e0e0e4] transition-colors hover:text-white">
             {t('footer.conduct')}
           </Link>

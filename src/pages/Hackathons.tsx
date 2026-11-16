@@ -99,7 +99,7 @@ function EventBlock({ event, highlight = false }: { event: EventInfo; highlight?
       className={`border bg-surface ${highlight ? 'border-primary' : 'border-line'}`}
     >
       {cover && (
-        <div className="h-[220px] overflow-hidden bg-[#eaeaea] sm:h-[280px]">
+        <div className="aspect-[5/2] overflow-hidden bg-[#eaeaea] sm:aspect-[2410/612]">
           <img src={cover} alt={event.name} className="block h-full w-full object-cover" />
         </div>
       )}
