@@ -106,6 +106,11 @@ function EventBlock({ event, highlight = false }: { event: EventInfo; highlight?
 
       <div className="flex flex-col gap-5 px-7 py-8">
         <div>
+          {/* A borda vermelha sozinha não diz o que distingue este bloco dos
+              de baixo, e "Próximos" fica longe depois de rolar. */}
+          {highlight && (
+            <p className="eyebrow m-0 mb-2 text-primary">{t('hackathons.upcomingBadge')}</p>
+          )}
           <h3 className="m-0 font-display text-[26px] font-bold">{event.name}</h3>
           <p className="m-0 mt-2 text-[15px] text-ink-muted">
             {[copy.date, copy.location].filter(Boolean).join(' · ')}
@@ -125,7 +130,29 @@ function EventBlock({ event, highlight = false }: { event: EventInfo; highlight?
         )}
 
         <div className="flex flex-wrap gap-3">
-          {event.registrationUrl && (
+          {/*
+            Um evento que ainda não acontece sempre oferece um caminho para
+            entrar. Antes o botão dependia de `registrationUrl`, e um evento
+            publicado sem esse campo — o estado normal de quem acabou de criar
+            a entrada — aparecia na página sem nenhuma forma de se inscrever.
+
+            Sem o link próprio, o destino é o cadastro do site; é o mesmo
+            fallback do destaque da home.
+          */}
+          {highlight &&
+            (event.registrationUrl ? (
+              <ExternalLink href={event.registrationUrl} primary>
+                {t('hackathons.registerCta')}
+              </ExternalLink>
+            ) : (
+              <Link
+                to="/join"
+                className="bg-primary px-5 py-2.5 text-[15px] font-bold text-white"
+              >
+                {t('hackathons.registerCta')}
+              </Link>
+            ))}
+          {!highlight && event.registrationUrl && (
             <ExternalLink href={event.registrationUrl} primary>
               {t('hackathons.registerCta')}
             </ExternalLink>
