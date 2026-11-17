@@ -8,6 +8,7 @@ import { Hackathons } from '../pages/Hackathons';
 import { Join } from '../pages/Join';
 import Volunteer from '../pages/Volunteer';
 import { Unsubscribe } from '../pages/Unsubscribe';
+import { EventPage } from '../pages/Event';
 
 /**
  * The redesign is one page plus three documents. Transparency, Support, FAQ and
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'hackathons', element: <Hackathons /> },
+      { path: 'hackathons/:slug', element: <EventPage /> },
+      // Link curto da divulgação. Era um redirect do Vercel direto para a
+      // inscrição no account; agora abre a página do evento.
+      { path: 'foton', element: <EventPage slug="foton-noic" /> },
       { path: 'join', element: <Join /> },
       { path: 'conduct', element: <Conduct /> },
       { path: 'terms', element: <Terms /> },

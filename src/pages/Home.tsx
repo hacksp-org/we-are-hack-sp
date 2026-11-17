@@ -205,7 +205,7 @@ function FeaturedEvent({ event }: { event: EventInfo | null }) {
               )}
 
               <Link
-                to="/hackathons"
+                to={`/hackathons/${event.id}`}
                 className="btn border-white/[0.28] px-7 py-3.5 text-base text-white"
               >
                 {t('home.nextEventDetails')}

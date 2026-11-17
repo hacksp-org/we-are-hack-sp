@@ -106,7 +106,11 @@ function EventBlock({ event, highlight = false }: { event: EventInfo; highlight?
 
       <div className="flex flex-col gap-5 px-7 py-8">
         <div>
-          <h3 className="m-0 font-display text-[26px] font-bold">{event.name}</h3>
+          <h3 className="m-0 font-display text-[26px] font-bold">
+            <Link to={`/hackathons/${event.id}`} className="hover:text-primary">
+              {event.name}
+            </Link>
+          </h3>
           <p className="m-0 mt-2 text-[15px] text-ink-muted">
             {[copy.date, copy.location].filter(Boolean).join(' · ')}
           </p>
@@ -125,6 +129,12 @@ function EventBlock({ event, highlight = false }: { event: EventInfo; highlight?
         )}
 
         <div className="flex flex-wrap gap-3">
+          <Link
+            to={`/hackathons/${event.id}`}
+            className="border border-line px-5 py-2.5 text-[15px] font-bold text-ink hover:border-primary"
+          >
+            {t('hackathons.details')}
+          </Link>
           {event.registrationUrl && (
             <ExternalLink href={event.registrationUrl} primary>
               {t('hackathons.registerCta')}

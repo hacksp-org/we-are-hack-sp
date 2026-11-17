@@ -1,11 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/foton",
-      "destination": "https://account.hacksp.org/attend/eventos/foton-noic",
-      "permanent": false
-    }
-  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
