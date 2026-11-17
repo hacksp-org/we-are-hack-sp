@@ -1,3 +1,25 @@
+/**
+ * O conteúdo de uma página de evento que não cabe no cartão: programação,
+ * para quem é, perguntas frequentes. Tudo opcional — a página mostra só as
+ * seções que o `events.json` preencher, então um evento novo ganha página
+ * com o mínimo (nome, data, local, descrição) e vai engordando pelo arquivo,
+ * sem deploy do site.
+ */
+export interface EventDetails {
+  about?: string[];
+  audience?: string;
+  schedule?: { time: string; title: string; description?: string }[];
+  faq?: { question: string; answer: string }[];
+}
+
+interface EventCopy {
+  date: string;
+  location: string;
+  description: string;
+  locationDescription?: string;
+  details?: EventDetails;
+}
+
 export interface EventInfo {
   id: string;
   status: 'upcoming' | 'past';
@@ -8,18 +30,8 @@ export interface EventInfo {
   bannerUrl?: string;
   googleMapsUrl?: string;
   translations: {
-    pt: {
-      date: string;
-      location: string;
-      description: string;
-      locationDescription?: string;
-    };
-    en: {
-      date: string;
-      location: string;
-      description: string;
-      locationDescription?: string;
-    };
+    pt: EventCopy;
+    en: EventCopy;
   };
   stats?: {
     participants: string;
@@ -31,6 +43,15 @@ export interface EventInfo {
 }
 
 export type EventsMap = Record<string, EventInfo>;
+
+/**
+ * O arquivo tem duas chaves por evento — a do objeto (`daydream`) e o `id`
+ * dentro dele (`daydream-sp`) — e elas nem sempre coincidem. A URL aceita
+ * qualquer uma das duas, para nenhum link já divulgado quebrar.
+ */
+export function findEvent(map: EventsMap, slug: string): EventInfo | null {
+  return map[slug] ?? Object.values(map).find((event) => event.id === slug) ?? null;
+}
 
 /**
  * Os eventos são conteúdo dinâmico e vivem no repositório `events`, fora do CDN
